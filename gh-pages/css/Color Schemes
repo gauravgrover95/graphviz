@@ -1,0 +1,129 @@
+******************************
+********** LIGHT *************
+******************************
+
+style: [
+  {
+    selector: 'node',
+    style: {
+      'background-color': '#935116',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: 'edge',
+    style: {
+      'width': 4,
+      'line-color': '#212F3D',
+      'target-arrow-color': '#212F3D',
+      'target-arrow-shape': 'triangle'
+    }
+  },
+  {
+    selector: '.hide-labels',
+    style: {
+      'content': '',
+    }
+  },
+  {
+    selector: '.regulated-line',
+    style: {
+      'line-color': '#AEB6BF',
+      'target-arrow-color': '#AEB6BF',
+    }
+  },
+  {
+    selector: '.regulator-line',
+    style: {
+      'line-color': '#AEB6BF',
+      'target-arrow-color': '#AEB6BF',
+      'line-style': 'dashed'
+    }
+  },
+  {
+    selector: '.regulated',
+    style: {
+      'background-color': '#7FB3D5',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: '.regulator',
+    style: {
+      'background-color': '#EDBB99',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: '.selected',
+    style: {
+      'background-color': 'brown',
+    }
+  },
+],
+
+
+******************************
+********** APPLE *************
+******************************
+
+style: [
+  {
+    selector: 'node',
+    style: {
+      'background-color': '#935116',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: 'edge',
+    style: {
+      'width': 4,
+      'line-color': '#212F3D',
+      'target-arrow-color': '#212F3D',
+      'target-arrow-shape': 'triangle'
+    }
+  },
+  {
+    selector: '.hide-labels',
+    style: {
+      'content': '',
+    }
+  },
+  {
+    selector: '.regulated-line',
+    style: {
+      'line-color': '#AEB6BF',
+      'target-arrow-color': '#AEB6BF',
+    }
+  },
+  {
+    selector: '.regulator-line',
+    style: {
+      'line-color': '#AEB6BF',
+      'target-arrow-color': '#AEB6BF',
+      'line-style': 'dashed'
+    }
+  },
+  {
+    selector: '.regulated',
+    style: {
+      'background-color': '#FF5D56',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: '.regulator',
+    style: {
+      'background-color': '#FFBD35',
+      'label': 'data(id)'
+    }
+  },
+  {
+    selector: '.selected',
+    style: {
+      'background-color': 'brown',
+    }
+  },
+],
+

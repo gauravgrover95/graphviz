@@ -1,0 +1,198 @@
+body {
+  background: #dddddd;
+  overflow-x: hidden; }
+
+h1 {
+  background: #763C3C;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 14px;
+  margin-bottom: 15px; }
+
+.cytoscape-navigator {
+  position: relative !important;
+  border: 1px solid #000;
+  background: #fff;
+  z-index: 99999;
+  width: 100% !important;
+  height: 35vh;
+  background: #eee; }
+
+#cy {
+  background: #eee; }
+
+.cy-context-menus-cxt-menuitem {
+  width: 137px; }
+
+.ui-state-active {
+  background: #607D8B;
+  border-color: #1f4658; }
+
+.title {
+  text-align: center; }
+
+.scores {
+  border: 1px solid black;
+  margin-bottom: 20px !important;
+  font-size: 20px;
+  padding-left: 12px;
+  margin: 0 auto; }
+
+.scores #perturb {
+  font-weight: bold; }
+
+.scores #sign {
+  font-weight: bold; }
+
+#cy {
+  height: 80vh;
+  border: 1px solid black; }
+
+.console {
+  position: relative; }
+
+input {
+  height: 24px;
+  width: 72.8%;
+  /*margin-bottom: 5px;*/
+  padding-left: 4px; }
+
+.controls {
+  position: relative;
+  border: 1px solid black;
+  /*height: 10vh;*/ }
+
+.controls > .slider-box {
+  padding: 4px;
+  background: #adacab;
+  color: #3d3d4a; }
+
+.controls > .input-box {
+  position: relative;
+  margin-bottom: 14px; }
+
+/*.controls > div {
+  background: #DDDDDD;
+  height: 160px;
+}*/
+.controls button {
+  font-size: 12px !important;
+  background: black;
+  color: white;
+  border: 1px solid #3B3B3B;
+  border-radius: 2px;
+  padding: 2px 3px; }
+
+.controls .input-buttons {
+  float: right;
+  width: 80px; }
+
+.controls .non-input-buttons {
+  width: 60px; }
+
+.controls #save-image-button {
+  width: 100px; }
+
+.controls button:active {
+  background: #63520A; }
+
+.controls button:focus {
+  color: white; }
+
+.controls button:hover {
+  color: white; }
+
+.controls {
+  padding: 10px;
+  height: 45vh; }
+  .controls button {
+    font-size: 8px;
+    /*background: #551D00;*/ }
+
+
+  footer {
+    height: 25px;
+    /*border: 1px solid black;*/
+    background: grey;
+    color: #dadada;
+    text-align: center;
+    padding: 4px;
+    padding-bottom: 6px; }
+
+/*##  Slider CSS  */
+.switch {
+  position: relative;
+  display: inline-block;
+  float: right;
+  width: 60px;
+  height: 22px; }
+
+.switch input {
+  display: none; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s; }
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s; }
+
+input:checked + .slider {
+  background-color: black; }
+
+input:focus + .slider {
+  box-shadow: 0 0 1px black; }
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(32px);
+  -ms-transform: translateX(32px);
+  transform: translateX(32px); }
+
+/*#### Rounded sliders */
+.slider.round {
+  border-radius: 34px; }
+
+.slider.round:before {
+  border-radius: 50%; }
+
+/*## Slider CSS end */
+#left-col {
+  /*padding-right: 0;*/ }
+
+#right-col {
+  padding-left: 0; }
+
+
+
+hr {
+    /* margin-top: 20px; */
+    /* margin-bottom: 20px; */
+    margin: 0;
+    margin-bottom: 5px;
+    position: relative;
+    top: -5px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+@media only screen and (max-width: 1350px) {
+    input {
+      width: 62%
+    }
+}

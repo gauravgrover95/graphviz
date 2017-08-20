@@ -1,0 +1,3710 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cytoscape</title>
+
+<link rel="stylesheet" type="text/css" href="/mycoregdb/public/cytoscape/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/js.cytoscape-navigator/cytoscape.js-navigator.css">
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/cytoscape-panzoom/cytoscape.js-panzoom.css"/>
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/cytoscape-context-menus/cytoscape-context-menus.css"/>
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/jquery-ui/jquery-ui.min.css">
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/vex/dist/css/vex.css">
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/bower_components/vex/dist/css/vex-theme-os.css">
+<link rel="stylesheet" href="/mycoregdb/public/cytoscape/css/main.css">
+
+<style>
+
+  hr {
+    background: #828282;
+    height: 1px;
+    border: 0;
+}
+
+  #loader {
+    display: none;
+    border : 1px solid black;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    position: fixed;
+    top: 0px;
+    height: 100vh;
+    width: 100vw;
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #loader .cntnt {
+    padding: 5px 30px;
+    /*border: 1px solid white;*/
+    font-size: 16px;
+    width: 100vw;
+    text-align: center;
+    /*margin: 10px auto;*/
+    position: absolute;
+    bottom: 20px;
+  
+  }
+</style>
+
+<style>
+
+.cs-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.cs-loader-inner {
+  transform: translateY(-50%);
+  top: 50%;
+  position: absolute;
+  width: calc(100% - 200px);
+  color: #FFF;
+  padding: 0 100px;
+  text-align: center;
+}
+
+.cs-loader-inner label {
+  font-size: 20px;
+  opacity: 0;
+  display:inline-block;
+}
+
+@keyframes lol {
+  0% {
+    opacity: 0;
+    transform: translateX(-300px);
+  }
+  33% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  66% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(300px);
+  }
+}
+
+@-webkit-keyframes lol {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(-300px);
+  }
+  33% {
+    opacity: 1;
+    -webkit-transform: translateX(0px);
+  }
+  66% {
+    opacity: 1;
+    -webkit-transform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateX(300px);
+  }
+}
+
+.cs-loader-inner label:nth-child(6) {
+  -webkit-animation: lol 3s infinite ease-in-out;
+  animation: lol 3s infinite ease-in-out;
+}
+
+.cs-loader-inner label:nth-child(5) {
+  -webkit-animation: lol 3s 100ms infinite ease-in-out;
+  animation: lol 3s 100ms infinite ease-in-out;
+}
+
+.cs-loader-inner label:nth-child(4) {
+  -webkit-animation: lol 3s 200ms infinite ease-in-out;
+  animation: lol 3s 200ms infinite ease-in-out;
+}
+
+.cs-loader-inner label:nth-child(3) {
+  -webkit-animation: lol 3s 300ms infinite ease-in-out;
+  animation: lol 3s 300ms infinite ease-in-out;
+}
+
+.cs-loader-inner label:nth-child(2) {
+  -webkit-animation: lol 3s 400ms infinite ease-in-out;
+  animation: lol 3s 400ms infinite ease-in-out;
+}
+
+.cs-loader-inner label:nth-child(1) {
+  -webkit-animation: lol 3s 500ms infinite ease-in-out;
+  animation: lol 3s 500ms infinite ease-in-out;
+}
+</style>
+
+</head>
+
+
+<body style="diaplay: table">
+<div id="loader" style="display: none">
+  {# <span class="cntnt">Loading...</span> #}
+  {# <span class="cntnt">Loading.....</span> #}
+  {# <span class="cntnt">Please Wait...</span> #}
+  {# <span class="cntnt">Precessing...</span>   #}
+  {# <span class="cntnt">Precessing... Pease Wait</span> #}
+  <span class="cntnt">*This operation may take a few seconds. Please wait...</span>
+  <div class="cs-loader">
+    <div class="cs-loader-inner">
+      <label> ●</label>
+      <label> ●</label>
+      <label> ●</label>
+      <label> ●</label>
+      <label> ●</label>
+      <label> ●</label>
+    </div>
+  </div>
+</div>
+
+<a href="/mycoregdb/" style="position: absolute; top: 25px; left: 25px;"><img src="/mycoregdb/public/img/house_icon.png" width="25" height="25"></a>
+<h1>Network | {{q}}</h1>
+
+<div class="wrapper">
+
+
+<div class="container-fluid">
+  <div class="scores">
+    <p>Score: <span id="perturb">100</span><span id="sign">%</span> <!--<span style="background: yellow" id="view1">Please Wait</span></p>-->
+  </div>
+</div>
+
+
+<div class="container-fluid">
+  <div class="row">
+
+   <div class="col-md-9" id="left-col">
+      <!-- This is the main div for map -->
+      <div id="cy"></div>
+   </div> <!-- left col end -->
+
+   <div class="col-md-3" id="right-col">
+      <div class="cytoscape-navigator"></div>
+
+        <!-- This is the div for controls -->
+        <div class="controls">
+        <div class="slider-box" id="tracer-box">
+          Tracer:
+            <label class="switch">
+              <input type="checkbox" class="switch-box" id="tracer-button">
+              <div class="slider round"></div>
+            </label>
+        </div><br>
+        <div class="slider-box" id="connector-box">
+          Connector:
+            <label class="switch">
+              <input type="checkbox" class="switch-box" id="connector-button">
+              <div class="slider round"></div>
+            </label>
+        </div><br>
+
+        <hr>
+
+            <div class="input-box"><input type="text" name="search-input" id="search-input" placeholder="Enter Gene Name"> <button class="input-buttons" id="search-button">Search</button></div>
+
+            <!--<div class="input-box"><input type="text" name="delete-input" id="delete-input" placeholder="Enter Gene Name"> <button class="input-buttons" id="delete-button">Delete</button></div>-->
+
+            <div class="input-box"><input type="text" name="delete-unit-input" id="delete-unit-input" placeholder="Enter Gene Name"> <button class="input-buttons" id="delete-unit-button">Delete</button></div>
+
+            <div class="input-box"><input type="text" name="hide-ends-inptut" id="hide-ends-input" placeholder="Enter Gene Name"> <button class="input-buttons" id="hide-ends-button"  id="hide-ends-button">Hide Ends</button></div>
+            
+            <button  class="non-input-buttons btn" id="undo-button">Undo</button>
+            <button  class="non-input-buttons btn" id="redo-button">Redo</button>
+            <button class="non-input-buttons btn"  id="center-button">Center</button>
+            <button  class="non-input-buttons btn" id="save-image-button">Save as Image</button>
+            <!-- <button  class="non-input-buttons btn" id="undo-all-button">Undo All</button> -->
+            <!-- <button  class="non-input-buttons btn" id="redo-all-button">Redo All</button> -->
+
+        </div> <!-- controls ends -->
+
+   </div> <!-- right col end -->
+  </div>
+  <footer style="diaplay: table-footer-group"> &copy; 2016 MycoRegDB.com All Rights Reserved</footer>
+</div>
+</div> <!-- wrapper end -->
+
+
+{# <div class="container-fluid" id="footer">
+</div> #}
+
+
+<!-- Plugins -->
+<script src="/mycoregdb/public/cytoscape/js/jquery-1.11.3.min.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<script src="/mycoregdb/public/cytoscape/js/Globals.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/cytoscape/dist/cytoscape.js"></script> 
+<script src="/mycoregdb/public/cytoscape/bower_components/cytoscape-panzoom/cytoscape-panzoom.js"></script>
+
+<script src="/mycoregdb/public/cytoscape/bower_components/cytoscape-context-menus/cytoscape-context-menus.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/js.cytoscape-navigator/cytoscape.js-navigator.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/cytoscape.js-undo-redo-master/cytoscape-undo-redo.js"></script>
+
+<script src="/mycoregdb/public/cytoscape/bower_components/tinycolor/dist/tinycolor-min.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/vex/dist/js/vex.combined.min.js"></script>
+<script src="/mycoregdb/public/cytoscape/bower_components/mustache.js/mustache.js"></script>
+
+
+<!-- User Scripts -->
+
+<script src="/mycoregdb/public/cytoscape/js/utilities.js"></script>
+<script>
+
+  var cont = document.getElementById('cy');
+
+  var cy = cytoscape({
+
+  container: cont, // container to render in
+
+  hideEdgesOnViewport: true,
+  textureOnViewport: true,
+
+  elements: [ // list of graph elements to start with
+
+  {% if method == 'dynamic' %}
+    {% for item in tags %}
+    { // node {{item}}
+      data: { id: '{{item}}' }
+    },
+    {% endfor %}
+
+
+    {% if search == true %}
+    {% for key, value in results %}
+    {% for val in value %}
+      {// {{key}}.{{val}}
+        data: { id: '{{key}}.{{val}}', source: '{{key}}', target: '{{val}}' }
+      },
+    {% endfor %}
+    {% endfor %}  
+    {% else %}
+    {% for row in results %}
+      {// {{row[0]}}.{{row[1]}}({{ row[2][:1]|upper ~ row[2][1:] }})
+        data: { id: '{{row[0]}}.{{row[1]}}({{ row[2][:1]|upper ~ row[2][1:] }})', source: '{{row[0]}}', target: '{{row[1]}}({{ row[2][:1]|upper ~ row[2][1:] }})' }
+      },
+    {% endfor %}
+    {% endif %}
+  {% else %}
+
+    {{results|raw}}
+
+  {% endif %}
+
+
+
+
+
+    // { // node Rv1221(SigE)
+    //   data: { id: 'a' }
+    // },
+    //     { // node Rv0251c(Hsp)
+    //   data: { id: 'b' }
+    // },
+    //     { // node Rv0467(Icl)
+    //   data: { id: 'c' }
+    // },
+    //     { // node Rv0468(FadB2)
+    //   data: { id: 'd' }
+    // },
+    //     { // node Rv0563(HtpX)
+    //   data: { id: 'e' }
+    // },
+    //     { // node Rv0981(MprA)
+    //   data: { id: 'f' }
+    // },
+    //     { // node Rv1057(Unannotated)
+    //   data: { id: 'g' }
+    // },
+    //     { // node Rv1130(Unannotated)
+    //   data: { id: 'h' }
+    // },
+    //     { // node Rv1329c(DinG)
+    //   data: { id: 'i' }
+    // },
+    //     { // node Rv2053c(Unannotated)
+    //   data: { id: 'j' }
+    // },
+    //     { // node Rv2710(SigB)
+    //   data: { id: 'k' }
+    // },
+    //     { // node Rv2745c(Unannotated)
+    //   data: { id: 'l' }
+    // },
+    //     { // node BCG0248(PckA)
+    //   data: { id: 'm' }
+    // },
+
+
+
+
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'a.b', source: 'a', target: 'b' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'b.d', source: 'b', target: 'd' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'c.d', source: 'c', target: 'd' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'd.c', source: 'd', target: 'c' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'd.e', source: 'd', target: 'e' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'e.f', source: 'e', target: 'f' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'f.g', source: 'f', target: 'g' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'e.h', source: 'e', target: 'h' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'h.i', source: 'h', target: 'i' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'i.j', source: 'i', target: 'j' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'j.k', source: 'j', target: 'k' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'k.l', source: 'k', target: 'l' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'l.m', source: 'l', target: 'm' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'c.e', source: 'c', target: 'e' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'b.f', source: 'b', target: 'f' }
+    // },
+    // {// Rv1221(SigE).Rv0251c(Hsp)
+    //     data: { id: 'f.e', source: 'f', target: 'e' }
+    // },
+
+
+
+  ],
+
+
+  style: [
+    
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#7FB3D5',
+        'content': 'data(id)',
+        'label': 'data(id)',
+      }
+    },
+    {
+      selector: '.plain-node',
+      style: {
+        'background-color': '#7FB3D5',
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        'width': 3,
+        'line-color': '#ccc',
+        'target-arrow-color': '#ccc',
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle'
+      }
+    },
+    {
+      selector: '.regulated-line',
+      style: {
+        'line-color': '#AEB6BF',
+        'target-arrow-color': '#AEB6BF',
+      }
+    },
+    {
+      selector: '.regulator-line',
+      style: {
+        'line-color': '#AEB6BF',
+        'target-arrow-color': '#AEB6BF',
+        'line-style': 'dashed'
+      }
+    },
+    {
+      selector: '.regulated',
+      style: {
+        'background-color': '#73d678',
+      }
+    },
+    {
+      selector: '.regulator',
+      style: {
+        'background-color': '#FFBD35',
+      }
+    },
+    {
+      selector: '.main-node',
+      style: {
+        'background-color': '#EDBB99' 
+      }
+    },
+    {
+      selector: '.selected',
+      style: {
+        'background-color': 'brown',
+        'border-color': '#000',
+        'border-width': '3px',
+        'font-size': '40px',
+      }
+    },
+    {
+      selector: '.hover-select',
+      style: {
+        'background-color': 'brown',
+        'border-color': '#000',
+        'border-width': '3px',
+        'font-size': '40px',
+      }
+    },
+    {
+      selector: '.highlighted-edges',
+      style: {
+        'line-color': 'black'
+      }
+    },
+    {
+      selector: '.traced-edges',
+      style: {
+        'line-color': 'black'
+      }
+    },
+    {
+      selector: '.tracer-ideal-selection',
+      style: {
+        'background-color': 'yellow' 
+      }
+    },
+    // {
+    //   selector: '.main-node',
+    //   style: {
+    //     'background-color': '#EDBB99' 
+    //   }
+    // },
+    {
+      selector: '.connector-node-selection',
+      style: {
+        'background-color': 'black' 
+      }
+    },
+    {
+      selector: '.connector-edge-selection',
+      style: {
+        'line-color': 'black',
+        'target-arrow-color': 'black'
+      }
+    },
+    {
+      selector: '.connector-middle-node-selection',
+      style: {
+        'background-color': 'green',
+        'font-size': '40px'
+      }
+    },
+    {
+      selector: '.hide-labels',
+      style: {
+      }
+    },
+    {
+      selector: 'node[[degree >= 0]][[degree <= 5]]',
+      style: {
+        'height': '50',
+        'width': '50'
+      }
+    },
+    {
+      selector: 'node[[degree >= 5]][[degree <= 10]]',
+      style: {
+        'height': '67.099759466767',
+        'width': '67.099759466767'
+      }
+    },{
+      selector: 'node[[degree >= 10]][[degree <= 15]]',
+      style: {
+        'height': '71.544346900319',
+        'width': '71.544346900319'
+      }
+    },{
+      selector: 'node[[degree >= 15]][[degree <= 20]]',
+      style: {
+        'height': '74.662120743305',
+        'width': '74.662120743305'
+      }
+    },{
+      selector: 'node[[degree >= 20]][[degree <= 25]]',
+      style: {
+        'height': '77.144176165949',
+        'width': '77.144176165949'
+      }
+    },{
+      selector: 'node[[degree >= 25]][[degree <= 30]]',
+      style: {
+        'height': '79.240177382129',
+        'width': '79.240177382129'
+      }
+    },{
+      selector: 'node[[degree >= 30]][[degree <= 35]]',
+      style: {
+        'height': '81.072325059539',
+        'width': '81.072325059539'
+      }
+    },{
+      selector: 'node[[degree >= 35]][[degree <= 40]]',
+      style: {
+        'height': '82.710663101886',
+        'width': '82.710663101886'
+      }
+    },{
+      selector: 'node[[degree >= 40]][[degree <= 45]]',
+      style: {
+        'height': '84.199518933534',
+        'width': '84.199518933534'
+      }
+    },{
+      selector: 'node[[degree >= 45]][[degree <= 50]]',
+      style: {
+        'height': '85.568933044901',
+        'width': '85.568933044901'
+      }
+    },{
+      selector: 'node[[degree >= 50]][[degree <= 55]]',
+      style: {
+        'height': '86.840314986404',
+        'width': '86.840314986404'
+      }
+    },{
+      selector: 'node[[degree >= 55]][[degree <= 60]]',
+      style: {
+        'height': '88.029524607614',
+        'width': '88.029524607614'
+      }
+    },{
+      selector: 'node[[degree >= 60]][[degree <= 65]]',
+      style: {
+        'height': '89.148676411689',
+        'width': '89.148676411689'
+      }
+    },{
+      selector: 'node[[degree >= 65]][[degree <= 70]]',
+      style: {
+        'height': '90.207257585891',
+        'width': '90.207257585891'
+      }
+    },{
+      selector: 'node[[degree >= 70]][[degree <= 75]]',
+      style: {
+        'height': '91.212852998086',
+        'width': '91.212852998086'
+      }
+    },{
+      selector: 'node[[degree >= 75]][[degree <= 80]]',
+      style: {
+        'height': '92.171633265087',
+        'width': '92.171633265087'
+      }
+    },{
+      selector: 'node[[degree >= 80]][[degree <= 85]]',
+      style: {
+        'height': '93.088693800638',
+        'width': '93.088693800638'
+      }
+    },{
+      selector: 'node[[degree >= 85]][[degree <= 90]]',
+      style: {
+        'height': '93.968296721582',
+        'width': '93.968296721582'
+      }
+    },{
+      selector: 'node[[degree >= 90]][[degree <= 95]]',
+      style: {
+        'height': '94.814047465572',
+        'width': '94.814047465572'
+      }
+    },{
+      selector: 'node[[degree >= 95]][[degree <= 100]]',
+      style: {
+        'height': '95.62902635387',
+        'width': '95.62902635387'
+      }
+    },{
+      selector: 'node[[degree >= 100]][[degree <= 105]]',
+      style: {
+        'height': '96.415888336128',
+        'width': '96.415888336128'
+      }
+    },{
+      selector: 'node[[degree >= 105]][[degree <= 110]]',
+      style: {
+        'height': '97.176939803165',
+        'width': '97.176939803165'
+      }
+    },{
+      selector: 'node[[degree >= 110]][[degree <= 115]]',
+      style: {
+        'height': '97.914198570628',
+        'width': '97.914198570628'
+      }
+    },{
+      selector: 'node[[degree >= 115]][[degree <= 120]]',
+      style: {
+        'height': '98.629441310943',
+        'width': '98.629441310943'
+      }
+    },{
+      selector: 'node[[degree >= 120]][[degree <= 125]]',
+      style: {
+        'height': '99.324241486609',
+        'width': '99.324241486609'
+      }
+    },{
+      selector: 'node[[degree >= 125]][[degree <= 130]]',
+      style: {
+        'height': '100',
+        'width': '100'
+      }
+    },{
+      selector: 'node[[degree >= 130]][[degree <= 135]]',
+      style: {
+        'height': '100.65797019101',
+        'width': '100.65797019101'
+      }
+    },{
+      selector: 'node[[degree >= 135]][[degree <= 140]]',
+      style: {
+        'height': '101.2992784003',
+        'width': '101.2992784003'
+      }
+    },{
+      selector: 'node[[degree >= 140]][[degree <= 145]]',
+      style: {
+        'height': '101.92494101851',
+        'width': '101.92494101851'
+      }
+    },{
+      selector: 'node[[degree >= 145]][[degree <= 150]]',
+      style: {
+        'height': '102.53587872493',
+        'width': '102.53587872493'
+      }
+    },{
+      selector: 'node[[degree >= 150]][[degree <= 155]]',
+      style: {
+        'height': '103.13292845913',
+        'width': '103.13292845913'
+      }
+    },{
+      selector: 'node[[degree >= 155]][[degree <= 160]]',
+      style: {
+        'height': '103.71685354945',
+        'width': '103.71685354945'
+      }
+    },{
+      selector: 'node[[degree >= 160]][[degree <= 165]]',
+      style: {
+        'height': '104.2883523319',
+        'width': '104.2883523319'
+      }
+    },{
+      selector: 'node[[degree >= 165]][[degree <= 170]]',
+      style: {
+        'height': '104.84806552433',
+        'width': '104.84806552433'
+      }
+    },{
+      selector: 'node[[degree >= 170]][[degree <= 175]]',
+      style: {
+        'height': '105.39658256754',
+        'width': '105.39658256754'
+      }
+    },{
+      selector: 'node[[degree >= 175]][[degree <= 180]]',
+      style: {
+        'height': '105.93444710407',
+        'width': '105.93444710407'
+      }
+    },{
+      selector: 'node[[degree >= 180]][[degree <= 185]]',
+      style: {
+        'height': '106.46216173286',
+        'width': '106.46216173286'
+      }
+    },{
+      selector: 'node[[degree >= 185]][[degree <= 190]]',
+      style: {
+        'height': '106.98019215305',
+        'width': '106.98019215305'
+      }
+    },{
+      selector: 'node[[degree >= 190]][[degree <= 195]]',
+      style: {
+        'height': '107.48897078945',
+        'width': '107.48897078945'
+      }
+    },{
+      selector: 'node[[degree >= 195]][[degree <= 200]]',
+      style: {
+        'height': '107.98889997649',
+        'width': '107.98889997649'
+      }
+    },{
+      selector: 'node[[degree >= 200]][[degree <= 205]]',
+      style: {
+        'height': '108.48035476426',
+        'width': '108.48035476426'
+      }
+    },{
+      selector: 'node[[degree >= 205]][[degree <= 210]]',
+      style: {
+        'height': '108.9636853997',
+        'width': '108.9636853997'
+      }
+    },{
+      selector: 'node[[degree >= 210]][[degree <= 215]]',
+      style: {
+        'height': '109.43921952763',
+        'width': '109.43921952763'
+      }
+    },{
+      selector: 'node[[degree >= 215]][[degree <= 220]]',
+      style: {
+        'height': '109.90726414895',
+        'width': '109.90726414895'
+      }
+    },{
+      selector: 'node[[degree >= 220]][[degree <= 225]]',
+      style: {
+        'height': '110.36810736798',
+        'width': '110.36810736798'
+      }
+    },{
+      selector: 'node[[degree >= 225]][[degree <= 230]]',
+      style: {
+        'height': '110.82201995573',
+        'width': '110.82201995573'
+      }
+    },{
+      selector: 'node[[degree >= 230]][[degree <= 235]]',
+      style: {
+        'height': '111.26925675228',
+        'width': '111.26925675228'
+      }
+    },{
+      selector: 'node[[degree >= 235]][[degree <= 240]]',
+      style: {
+        'height': '111.71005792777',
+        'width': '111.71005792777'
+      }
+    },{
+      selector: 'node[[degree >= 240]][[degree <= 245]]',
+      style: {
+        'height': '112.14465011908',
+        'width': '112.14465011908'
+      }
+    },{
+      selector: 'node[[degree >= 245]][[degree <= 250]]',
+      style: {
+        'height': '112.57324745676',
+        'width': '112.57324745676'
+      }
+    },{
+      selector: 'node[[degree >= 250]][[degree <= 255]]',
+      style: {
+        'height': '112.99605249474',
+        'width': '112.99605249474'
+      }
+    },{
+      selector: 'node[[degree >= 255]][[degree <= 260]]',
+      style: {
+        'height': '113.41325705385',
+        'width': '113.41325705385'
+      }
+    },{
+      selector: 'node[[degree >= 260]][[degree <= 265]]',
+      style: {
+        'height': '113.8250429886',
+        'width': '113.8250429886'
+      }
+    },{
+      selector: 'node[[degree >= 265]][[degree <= 270]]',
+      style: {
+        'height': '114.23158288562',
+        'width': '114.23158288562'
+      }
+    },{
+      selector: 'node[[degree >= 270]][[degree <= 275]]',
+      style: {
+        'height': '114.63304070096',
+        'width': '114.63304070096'
+      }
+    },{
+      selector: 'node[[degree >= 275]][[degree <= 280]]',
+      style: {
+        'height': '115.02957234257',
+        'width': '115.02957234257'
+      }
+    },{
+      selector: 'node[[degree >= 280]][[degree <= 285]]',
+      style: {
+        'height': '115.42132620377',
+        'width': '115.42132620377'
+      }
+    },{
+      selector: 'node[[degree >= 285]][[degree <= 290]]',
+      style: {
+        'height': '115.80844365241',
+        'width': '115.80844365241'
+      }
+    },{
+      selector: 'node[[degree >= 290]][[degree <= 295]]',
+      style: {
+        'height': '116.19105948026',
+        'width': '116.19105948026'
+      }
+    },{
+      selector: 'node[[degree >= 295]][[degree <= 300]]',
+      style: {
+        'height': '116.56930231642',
+        'width': '116.56930231642'
+      }
+    },{
+      selector: 'node[[degree >= 300]][[degree <= 305]]',
+      style: {
+        'height': '116.94329500822',
+        'width': '116.94329500822'
+      }
+    },{
+      selector: 'node[[degree >= 305]][[degree <= 310]]',
+      style: {
+        'height': '117.31315497265',
+        'width': '117.31315497265'
+      }
+    },{
+      selector: 'node[[degree >= 310]][[degree <= 315]]',
+      style: {
+        'height': '117.67899452107',
+        'width': '117.67899452107'
+      }
+    },{
+      selector: 'node[[degree >= 315]][[degree <= 320]]',
+      style: {
+        'height': '118.04092115953',
+        'width': '118.04092115953'
+      }
+    },{
+      selector: 'node[[degree >= 320]][[degree <= 325]]',
+      style: {
+        'height': '118.39903786707',
+        'width': '118.39903786707'
+      }
+    },{
+      selector: 'node[[degree >= 325]][[degree <= 330]]',
+      style: {
+        'height': '118.75344335371',
+        'width': '118.75344335371'
+      }
+    },{
+      selector: 'node[[degree >= 330]][[degree <= 335]]',
+      style: {
+        'height': '119.10423230011',
+        'width': '119.10423230011'
+      }
+    },{
+      selector: 'node[[degree >= 335]][[degree <= 340]]',
+      style: {
+        'height': '119.45149558033',
+        'width': '119.45149558033'
+      }
+    },{
+      selector: 'node[[degree >= 340]][[degree <= 345]]',
+      style: {
+        'height': '119.79532046909',
+        'width': '119.79532046909'
+      }
+    },{
+      selector: 'node[[degree >= 345]][[degree <= 350]]',
+      style: {
+        'height': '120.135790835',
+        'width': '120.135790835'
+      }
+    },{
+      selector: 'node[[degree >= 350]][[degree <= 355]]',
+      style: {
+        'height': '120.47298732065',
+        'width': '120.47298732065'
+      }
+    },{
+      selector: 'node[[degree >= 355]][[degree <= 360]]',
+      style: {
+        'height': '120.80698751085',
+        'width': '120.80698751085'
+      }
+    },{
+      selector: 'node[[degree >= 360]][[degree <= 365]]',
+      style: {
+        'height': '121.1378660898',
+        'width': '121.1378660898'
+      }
+    },{
+      selector: 'node[[degree >= 365]][[degree <= 370]]',
+      style: {
+        'height': '121.46569498815',
+        'width': '121.46569498815'
+      }
+    },{
+      selector: 'node[[degree >= 370]][[degree <= 375]]',
+      style: {
+        'height': '121.79054352068',
+        'width': '121.79054352068'
+      }
+    },{
+      selector: 'node[[degree >= 375]][[degree <= 380]]',
+      style: {
+        'height': '122.11247851537',
+        'width': '122.11247851537'
+      }
+    },{
+      selector: 'node[[degree >= 380]][[degree <= 385]]',
+      style: {
+        'height': '122.43156443442',
+        'width': '122.43156443442'
+      }
+    },{
+      selector: 'node[[degree >= 385]][[degree <= 390]]',
+      style: {
+        'height': '122.74786348791',
+        'width': '122.74786348791'
+      }
+    },{
+      selector: 'node[[degree >= 390]][[degree <= 395]]',
+      style: {
+        'height': '123.06143574063',
+        'width': '123.06143574063'
+      }
+    },{
+      selector: 'node[[degree >= 395]][[degree <= 400]]',
+      style: {
+        'height': '123.37233921243',
+        'width': '123.37233921243'
+      }
+    },{
+      selector: 'node[[degree >= 400]][[degree <= 405]]',
+      style: {
+        'height': '123.68062997281',
+        'width': '123.68062997281'
+      }
+    },{
+      selector: 'node[[degree >= 405]][[degree <= 410]]',
+      style: {
+        'height': '123.98636222991',
+        'width': '123.98636222991'
+      }
+    },{
+      selector: 'node[[degree >= 410]][[degree <= 415]]',
+      style: {
+        'height': '124.28958841447',
+        'width': '124.28958841447'
+      }
+    },{
+      selector: 'node[[degree >= 415]][[degree <= 420]]',
+      style: {
+        'height': '124.59035925892',
+        'width': '124.59035925892'
+      }
+    },{
+      selector: 'node[[degree >= 420]][[degree <= 425]]',
+      style: {
+        'height': '124.88872387219',
+        'width': '124.88872387219'
+      }
+    },{
+      selector: 'node[[degree >= 425]][[degree <= 430]]',
+      style: {
+        'height': '125.18472981025',
+        'width': '125.18472981025'
+      }
+    },{
+      selector: 'node[[degree >= 430]][[degree <= 435]]',
+      style: {
+        'height': '125.47842314288',
+        'width': '125.47842314288'
+      }
+    },{
+      selector: 'node[[degree >= 435]][[degree <= 440]]',
+      style: {
+        'height': '125.76984851675',
+        'width': '125.76984851675'
+      }
+    },{
+      selector: 'node[[degree >= 440]][[degree <= 445]]',
+      style: {
+        'height': '126.05904921523',
+        'width': '126.05904921523'
+      }
+    },{
+      selector: 'node[[degree >= 445]][[degree <= 450]]',
+      style: {
+        'height': '126.34606721492',
+        'width': '126.34606721492'
+      }
+    },{
+      selector: 'node[[degree >= 450]][[degree <= 455]]',
+      style: {
+        'height': '126.63094323936',
+        'width': '126.63094323936'
+      }
+    },{
+      selector: 'node[[degree >= 455]][[degree <= 460]]',
+      style: {
+        'height': '126.91371680981',
+        'width': '126.91371680981'
+      }
+    },{
+      selector: 'node[[degree >= 460]][[degree <= 465]]',
+      style: {
+        'height': '127.19442629362',
+        'width': '127.19442629362'
+      }
+    },{
+      selector: 'node[[degree >= 465]][[degree <= 470]]',
+      style: {
+        'height': '127.47310894996',
+        'width': '127.47310894996'
+      }
+    },{
+      selector: 'node[[degree >= 470]][[degree <= 475]]',
+      style: {
+        'height': '127.74980097343',
+        'width': '127.74980097343'
+      }
+    },{
+      selector: 'node[[degree >= 475]][[degree <= 480]]',
+      style: {
+        'height': '128.02453753539',
+        'width': '128.02453753539'
+      }
+    },{
+      selector: 'node[[degree >= 480]][[degree <= 485]]',
+      style: {
+        'height': '128.29735282338',
+        'width': '128.29735282338'
+      }
+    },{
+      selector: 'node[[degree >= 485]][[degree <= 490]]',
+      style: {
+        'height': '128.56828007848',
+        'width': '128.56828007848'
+      }
+    },{
+      selector: 'node[[degree >= 490]][[degree <= 495]]',
+      style: {
+        'height': '128.83735163105',
+        'width': '128.83735163105'
+      }
+    },{
+      selector: 'node[[degree >= 495]][[degree <= 500]]',
+      style: {
+        'height': '129.10459893465',
+        'width': '129.10459893465'
+      }
+    },{
+      selector: 'node[[degree >= 500]][[degree <= 505]]',
+      style: {
+        'height': '129.37005259841',
+        'width': '129.37005259841'
+      }
+    },{
+      selector: 'node[[degree >= 505]][[degree <= 510]]',
+      style: {
+        'height': '129.63374241789',
+        'width': '129.63374241789'
+      }
+    },{
+      selector: 'node[[degree >= 510]][[degree <= 515]]',
+      style: {
+        'height': '129.89569740454',
+        'width': '129.89569740454'
+      }
+    },{
+      selector: 'node[[degree >= 515]][[degree <= 520]]',
+      style: {
+        'height': '130.15594581377',
+        'width': '130.15594581377'
+      }
+    },{
+      selector: 'node[[degree >= 520]][[degree <= 525]]',
+      style: {
+        'height': '130.41451517178',
+        'width': '130.41451517178'
+      }
+    },{
+      selector: 'node[[degree >= 525]][[degree <= 530]]',
+      style: {
+        'height': '130.67143230123',
+        'width': '130.67143230123'
+      }
+    },{
+      selector: 'node[[degree >= 530]][[degree <= 535]]',
+      style: {
+        'height': '130.92672334566',
+        'width': '130.92672334566'
+      }
+    },{
+      selector: 'node[[degree >= 535]][[degree <= 540]]',
+      style: {
+        'height': '131.18041379299',
+        'width': '131.18041379299'
+      }
+    },{
+      selector: 'node[[degree >= 540]][[degree <= 545]]',
+      style: {
+        'height': '131.43252849785',
+        'width': '131.43252849785'
+      }
+    },{
+      selector: 'node[[degree >= 545]][[degree <= 550]]',
+      style: {
+        'height': '131.68309170304',
+        'width': '131.68309170304'
+      }
+    },{
+      selector: 'node[[degree >= 550]][[degree <= 555]]',
+      style: {
+        'height': '131.93212706006',
+        'width': '131.93212706006'
+      }
+    },{
+      selector: 'node[[degree >= 555]][[degree <= 560]]',
+      style: {
+        'height': '132.17965764877',
+        'width': '132.17965764877'
+      }
+    },{
+      selector: 'node[[degree >= 560]][[degree <= 565]]',
+      style: {
+        'height': '132.42570599617',
+        'width': '132.42570599617'
+      }
+    },{
+      selector: 'node[[degree >= 565]][[degree <= 570]]',
+      style: {
+        'height': '132.6702940945',
+        'width': '132.6702940945'
+      }
+    },{
+      selector: 'node[[degree >= 570]][[degree <= 575]]',
+      style: {
+        'height': '132.9134434185',
+        'width': '132.9134434185'
+      }
+    },{
+      selector: 'node[[degree >= 575]][[degree <= 580]]',
+      style: {
+        'height': '133.15517494204',
+        'width': '133.15517494204'
+      }
+    },{
+      selector: 'node[[degree >= 580]][[degree <= 585]]',
+      style: {
+        'height': '133.39550915403',
+        'width': '133.39550915403'
+      }
+    },{
+      selector: 'node[[degree >= 585]][[degree <= 590]]',
+      style: {
+        'height': '133.63446607369',
+        'width': '133.63446607369'
+      }
+    },{
+      selector: 'node[[degree >= 590]][[degree <= 595]]',
+      style: {
+        'height': '133.87206526527',
+        'width': '133.87206526527'
+      }
+    },{
+      selector: 'node[[degree >= 595]][[degree <= 600]]',
+      style: {
+        'height': '134.1083258521',
+        'width': '134.1083258521'
+      }
+    },{
+      selector: 'node[[degree >= 600]][[degree <= 605]]',
+      style: {
+        'height': '134.34326653017',
+        'width': '134.34326653017'
+      }
+    },{
+      selector: 'node[[degree >= 605]][[degree <= 610]]',
+      style: {
+        'height': '134.57690558115',
+        'width': '134.57690558115'
+      }
+    },{
+      selector: 'node[[degree >= 610]][[degree <= 615]]',
+      style: {
+        'height': '134.80926088488',
+        'width': '134.80926088488'
+      }
+    },{
+      selector: 'node[[degree >= 615]][[degree <= 620]]',
+      style: {
+        'height': '135.04034993146',
+        'width': '135.04034993146'
+      }
+    },{
+      selector: 'node[[degree >= 620]][[degree <= 625]]',
+      style: {
+        'height': '135.27018983282',
+        'width': '135.27018983282'
+      }
+    },{
+      selector: 'node[[degree >= 625]][[degree <= 630]]',
+      style: {
+        'height': '135.49879733383',
+        'width': '135.49879733383'
+      }
+    },{
+      selector: 'node[[degree >= 630]][[degree <= 635]]',
+      style: {
+        'height': '135.72618882313',
+        'width': '135.72618882313'
+      }
+    },{
+      selector: 'node[[degree >= 635]][[degree <= 640]]',
+      style: {
+        'height': '135.95238034338',
+        'width': '135.95238034338'
+      }
+    },{
+      selector: 'node[[degree >= 640]][[degree <= 645]]',
+      style: {
+        'height': '136.17738760128',
+        'width': '136.17738760128'
+      }
+    },{
+      selector: 'node[[degree >= 645]][[degree <= 650]]',
+      style: {
+        'height': '136.40122597712',
+        'width': '136.40122597712'
+      }
+    },{
+      selector: 'node[[degree >= 650]][[degree <= 655]]',
+      style: {
+        'height': '136.62391053409',
+        'width': '136.62391053409'
+      }
+    },{
+      selector: 'node[[degree >= 655]][[degree <= 660]]',
+      style: {
+        'height': '136.84545602717',
+        'width': '136.84545602717'
+      }
+    },{
+      selector: 'node[[degree >= 660]][[degree <= 665]]',
+      style: {
+        'height': '137.06587691174',
+        'width': '137.06587691174'
+      }
+    },{
+      selector: 'node[[degree >= 665]][[degree <= 670]]',
+      style: {
+        'height': '137.28518735186',
+        'width': '137.28518735186'
+      }
+    },{
+      selector: 'node[[degree >= 670]][[degree <= 675]]',
+      style: {
+        'height': '137.50340122833',
+        'width': '137.50340122833'
+      }
+    },{
+      selector: 'node[[degree >= 675]][[degree <= 680]]',
+      style: {
+        'height': '137.72053214639',
+        'width': '137.72053214639'
+      }
+    },{
+      selector: 'node[[degree >= 680]][[degree <= 685]]',
+      style: {
+        'height': '137.93659344316',
+        'width': '137.93659344316'
+      }
+    },{
+      selector: 'node[[degree >= 685]][[degree <= 690]]',
+      style: {
+        'height': '138.15159819493',
+        'width': '138.15159819493'
+      }
+    },{
+      selector: 'node[[degree >= 690]][[degree <= 695]]',
+      style: {
+        'height': '138.36555922404',
+        'width': '138.36555922404'
+      }
+    },{
+      selector: 'node[[degree >= 695]][[degree <= 700]]',
+      style: {
+        'height': '138.57848910565',
+        'width': '138.57848910565'
+      }
+    },{
+      selector: 'node[[degree >= 700]][[degree <= 705]]',
+      style: {
+        'height': '138.79040017426',
+        'width': '138.79040017426'
+      }
+    },{
+      selector: 'node[[degree >= 705]][[degree <= 710]]',
+      style: {
+        'height': '139.00130452997',
+        'width': '139.00130452997'
+      }
+    },{
+      selector: 'node[[degree >= 710]][[degree <= 715]]',
+      style: {
+        'height': '139.21121404456',
+        'width': '139.21121404456'
+      }
+    },{
+      selector: 'node[[degree >= 715]][[degree <= 720]]',
+      style: {
+        'height': '139.42014036741',
+        'width': '139.42014036741'
+      }
+    },{
+      selector: 'node[[degree >= 720]][[degree <= 725]]',
+      style: {
+        'height': '139.62809493114',
+        'width': '139.62809493114'
+      }
+    },{
+      selector: 'node[[degree >= 725]][[degree <= 730]]',
+      style: {
+        'height': '139.83508895715',
+        'width': '139.83508895715'
+      }
+    },{
+      selector: 'node[[degree >= 730]][[degree <= 735]]',
+      style: {
+        'height': '140.04113346094',
+        'width': '140.04113346094'
+      }
+    },{
+      selector: 'node[[degree >= 735]][[degree <= 740]]',
+      style: {
+        'height': '140.24623925725',
+        'width': '140.24623925725'
+      }
+    },{
+      selector: 'node[[degree >= 740]][[degree <= 745]]',
+      style: {
+        'height': '140.4504169651',
+        'width': '140.4504169651'
+      }
+    },{
+      selector: 'node[[degree >= 745]][[degree <= 750]]',
+      style: {
+        'height': '140.65367701259',
+        'width': '140.65367701259'
+      }
+    },{
+      selector: 'node[[degree >= 750]][[degree <= 755]]',
+      style: {
+        'height': '140.85602964161',
+        'width': '140.85602964161'
+      }
+    },{
+      selector: 'node[[degree >= 755]][[degree <= 760]]',
+      style: {
+        'height': '141.05748491235',
+        'width': '141.05748491235'
+      }
+    },{
+      selector: 'node[[degree >= 760]][[degree <= 765]]',
+      style: {
+        'height': '141.25805270774',
+        'width': '141.25805270774'
+      }
+    },{
+      selector: 'node[[degree >= 765]][[degree <= 770]]',
+      style: {
+        'height': '141.45774273771',
+        'width': '141.45774273771'
+      }
+    },{
+      selector: 'node[[degree >= 770]][[degree <= 775]]',
+      style: {
+        'height': '141.6565645433',
+        'width': '141.6565645433'
+      }
+    },{
+      selector: 'node[[degree >= 775]][[degree <= 780]]',
+      style: {
+        'height': '141.85452750071',
+        'width': '141.85452750071'
+      }
+    },{
+      selector: 'node[[degree >= 780]][[degree <= 785]]',
+      style: {
+        'height': '142.05164082516',
+        'width': '142.05164082516'
+      }
+    },{
+      selector: 'node[[degree >= 785]][[degree <= 790]]',
+      style: {
+        'height': '142.24791357468',
+        'width': '142.24791357468'
+      }
+    },{
+      selector: 'node[[degree >= 790]][[degree <= 795]]',
+      style: {
+        'height': '142.44335465376',
+        'width': '142.44335465376'
+      }
+    },{
+      selector: 'node[[degree >= 795]][[degree <= 800]]',
+      style: {
+        'height': '142.63797281696',
+        'width': '142.63797281696'
+      }
+    },{
+      selector: 'node[[degree >= 800]][[degree <= 805]]',
+      style: {
+        'height': '142.83177667226',
+        'width': '142.83177667226'
+      }
+    },{
+      selector: 'node[[degree >= 805]][[degree <= 810]]',
+      style: {
+        'height': '143.0247746845',
+        'width': '143.0247746845'
+      }
+    },{
+      selector: 'node[[degree >= 810]][[degree <= 815]]',
+      style: {
+        'height': '143.21697517862',
+        'width': '143.21697517862'
+      }
+    },{
+      selector: 'node[[degree >= 815]][[degree <= 820]]',
+      style: {
+        'height': '143.40838634276',
+        'width': '143.40838634276'
+      }
+    },{
+      selector: 'node[[degree >= 820]][[degree <= 825]]',
+      style: {
+        'height': '143.59901623141',
+        'width': '143.59901623141'
+      }
+    },{
+      selector: 'node[[degree >= 825]][[degree <= 830]]',
+      style: {
+        'height': '143.78887276835',
+        'width': '143.78887276835'
+      }
+    },{
+      selector: 'node[[degree >= 830]][[degree <= 835]]',
+      style: {
+        'height': '143.97796374953',
+        'width': '143.97796374953'
+      }
+    },{
+      selector: 'node[[degree >= 835]][[degree <= 840]]',
+      style: {
+        'height': '144.16629684595',
+        'width': '144.16629684595'
+      }
+    },{
+      selector: 'node[[degree >= 840]][[degree <= 845]]',
+      style: {
+        'height': '144.35387960633',
+        'width': '144.35387960633'
+      }
+    },{
+      selector: 'node[[degree >= 845]][[degree <= 850]]',
+      style: {
+        'height': '144.54071945983',
+        'width': '144.54071945983'
+      }
+    },{
+      selector: 'node[[degree >= 850]][[degree <= 855]]',
+      style: {
+        'height': '144.72682371859',
+        'width': '144.72682371859'
+      }
+    },{
+      selector: 'node[[degree >= 855]][[degree <= 860]]',
+      style: {
+        'height': '144.91219958029',
+        'width': '144.91219958029'
+      }
+    },{
+      selector: 'node[[degree >= 860]][[degree <= 865]]',
+      style: {
+        'height': '145.09685413058',
+        'width': '145.09685413058'
+      }
+    },{
+      selector: 'node[[degree >= 865]][[degree <= 870]]',
+      style: {
+        'height': '145.28079434546',
+        'width': '145.28079434546'
+      }
+    },{
+      selector: 'node[[degree >= 870]][[degree <= 875]]',
+      style: {
+        'height': '145.4640270936',
+        'width': '145.4640270936'
+      }
+    },{
+      selector: 'node[[degree >= 875]][[degree <= 880]]',
+      style: {
+        'height': '145.64655913862',
+        'width': '145.64655913862'
+      }
+    },{
+      selector: 'node[[degree >= 880]][[degree <= 885]]',
+      style: {
+        'height': '145.82839714126',
+        'width': '145.82839714126'
+      }
+    },{
+      selector: 'node[[degree >= 885]][[degree <= 890]]',
+      style: {
+        'height': '146.00954766152',
+        'width': '146.00954766152'
+      }
+    },{
+      selector: 'node[[degree >= 890]][[degree <= 895]]',
+      style: {
+        'height': '146.19001716077',
+        'width': '146.19001716077'
+      }
+    },{
+      selector: 'node[[degree >= 895]][[degree <= 900]]',
+      style: {
+        'height': '146.36981200375',
+        'width': '146.36981200375'
+      }
+    },{
+      selector: 'node[[degree >= 900]][[degree <= 905]]',
+      style: {
+        'height': '146.54893846056',
+        'width': '146.54893846056'
+      }
+    },{
+      selector: 'node[[degree >= 905]][[degree <= 910]]',
+      style: {
+        'height': '146.72740270858',
+        'width': '146.72740270858'
+      }
+    },{
+      selector: 'node[[degree >= 910]][[degree <= 915]]',
+      style: {
+        'height': '146.90521083434',
+        'width': '146.90521083434'
+      }
+    },{
+      selector: 'node[[degree >= 915]][[degree <= 920]]',
+      style: {
+        'height': '147.08236883534',
+        'width': '147.08236883534'
+      }
+    },{
+      selector: 'node[[degree >= 920]][[degree <= 925]]',
+      style: {
+        'height': '147.25888262189',
+        'width': '147.25888262189'
+      }
+    },{
+      selector: 'node[[degree >= 925]][[degree <= 930]]',
+      style: {
+        'height': '147.43475801873',
+        'width': '147.43475801873'
+      }
+    },{
+      selector: 'node[[degree >= 930]][[degree <= 935]]',
+      style: {
+        'height': '147.61000076685',
+        'width': '147.61000076685'
+      }
+    },{
+      selector: 'node[[degree >= 935]][[degree <= 940]]',
+      style: {
+        'height': '147.78461652504',
+        'width': '147.78461652504'
+      }
+    },{
+      selector: 'node[[degree >= 940]][[degree <= 945]]',
+      style: {
+        'height': '147.95861087156',
+        'width': '147.95861087156'
+      }
+    },{
+      selector: 'node[[degree >= 945]][[degree <= 950]]',
+      style: {
+        'height': '148.13198930566',
+        'width': '148.13198930566'
+      }
+    },{
+      selector: 'node[[degree >= 950]][[degree <= 955]]',
+      style: {
+        'height': '148.30475724916',
+        'width': '148.30475724916'
+      }
+    },{
+      selector: 'node[[degree >= 955]][[degree <= 960]]',
+      style: {
+        'height': '148.4769200479',
+        'width': '148.4769200479'
+      }
+    },{
+      selector: 'node[[degree >= 960]][[degree <= 965]]',
+      style: {
+        'height': '148.64848297322',
+        'width': '148.64848297322'
+      }
+    },{
+      selector: 'node[[degree >= 965]][[degree <= 970]]',
+      style: {
+        'height': '148.81945122337',
+        'width': '148.81945122337'
+      }
+    },{
+      selector: 'node[[degree >= 970]][[degree <= 975]]',
+      style: {
+        'height': '148.98982992491',
+        'width': '148.98982992491'
+      }
+    },{
+      selector: 'node[[degree >= 975]][[degree <= 980]]',
+      style: {
+        'height': '149.15962413404',
+        'width': '149.15962413404'
+      }
+    },{
+      selector: 'node[[degree >= 980]][[degree <= 985]]',
+      style: {
+        'height': '149.32883883793',
+        'width': '149.32883883793'
+      }
+    },{
+      selector: 'node[[degree >= 985]][[degree <= 990]]',
+      style: {
+        'height': '149.49747895601',
+        'width': '149.49747895601'
+      }
+    },{
+      selector: 'node[[degree >= 990]][[degree <= 995]]',
+      style: {
+        'height': '149.66554934126',
+        'width': '149.66554934126'
+      }
+    },{
+      selector: 'node[[degree >= 995]][[degree <= 1000]]',
+      style: {
+        'height': '149.83305478137',
+        'width': '149.83305478137'
+      }
+    },{
+      selector: 'node[[degree >= 1000]][[degree <= 1005]]',
+      style: {
+        'height': '150',
+        'width': '150'
+      }
+    },{
+      selector: 'node[[degree >= 1005]][[degree <= 1010]]',
+      style: {
+        'height': '150.16638965793',
+        'width': '150.16638965793'
+      }
+    },{
+      selector: 'node[[degree >= 1010]][[degree <= 1015]]',
+      style: {
+        'height': '150.33222835421',
+        'width': '150.33222835421'
+      }
+    },{
+      selector: 'node[[degree >= 1015]][[degree <= 1020]]',
+      style: {
+        'height': '150.49752062727',
+        'width': '150.49752062727'
+      }
+    },{
+      selector: 'node[[degree >= 1020]][[degree <= 1025]]',
+      style: {
+        'height': '150.66227095601',
+        'width': '150.66227095601'
+      }
+    },{
+      selector: 'node[[degree >= 1025]][[degree <= 1030]]',
+      style: {
+        'height': '150.82648376091',
+        'width': '150.82648376091'
+      }
+    },{
+      selector: 'node[[degree >= 1030]][[degree <= 1035]]',
+      style: {
+        'height': '150.990163405',
+        'width': '150.990163405'
+      }
+    },{
+      selector: 'node[[degree >= 1035]][[degree <= 1040]]',
+      style: {
+        'height': '151.15331419494',
+        'width': '151.15331419494'
+      }
+    },{
+      selector: 'node[[degree >= 1040]][[degree <= 1045]]',
+      style: {
+        'height': '151.31594038202',
+        'width': '151.31594038202'
+      }
+    },{
+      selector: 'node[[degree >= 1045]][[degree <= 1050]]',
+      style: {
+        'height': '151.47804616307',
+        'width': '151.47804616307'
+      }
+    },{
+      selector: 'node[[degree >= 1050]][[degree <= 1055]]',
+      style: {
+        'height': '151.63963568149',
+        'width': '151.63963568149'
+      }
+    },{
+      selector: 'node[[degree >= 1055]][[degree <= 1060]]',
+      style: {
+        'height': '151.80071302812',
+        'width': '151.80071302812'
+      }
+    },{
+      selector: 'node[[degree >= 1060]][[degree <= 1065]]',
+      style: {
+        'height': '151.96128224222',
+        'width': '151.96128224222'
+      }
+    },{
+      selector: 'node[[degree >= 1065]][[degree <= 1070]]',
+      style: {
+        'height': '152.12134731229',
+        'width': '152.12134731229'
+      }
+    },{
+      selector: 'node[[degree >= 1070]][[degree <= 1075]]',
+      style: {
+        'height': '152.28091217697',
+        'width': '152.28091217697'
+      }
+    },{
+      selector: 'node[[degree >= 1075]][[degree <= 1080]]',
+      style: {
+        'height': '152.43998072591',
+        'width': '152.43998072591'
+      }
+    },{
+      selector: 'node[[degree >= 1080]][[degree <= 1085]]',
+      style: {
+        'height': '152.5985568006',
+        'width': '152.5985568006'
+      }
+    },{
+      selector: 'node[[degree >= 1085]][[degree <= 1090]]',
+      style: {
+        'height': '152.75664419516',
+        'width': '152.75664419516'
+      }
+    },{
+      selector: 'node[[degree >= 1090]][[degree <= 1095]]',
+      style: {
+        'height': '152.91424665715',
+        'width': '152.91424665715'
+      }
+    },{
+      selector: 'node[[degree >= 1095]][[degree <= 1100]]',
+      style: {
+        'height': '153.07136788838',
+        'width': '153.07136788838'
+      }
+    },{
+      selector: 'node[[degree >= 1100]][[degree <= 1105]]',
+      style: {
+        'height': '153.22801154564',
+        'width': '153.22801154564'
+      }
+    },{
+      selector: 'node[[degree >= 1105]][[degree <= 1110]]',
+      style: {
+        'height': '153.38418124145',
+        'width': '153.38418124145'
+      }
+    },{
+      selector: 'node[[degree >= 1110]][[degree <= 1115]]',
+      style: {
+        'height': '153.53988054484',
+        'width': '153.53988054484'
+      }
+    },{
+      selector: 'node[[degree >= 1115]][[degree <= 1120]]',
+      style: {
+        'height': '153.695112982',
+        'width': '153.695112982'
+      }
+    },{
+      selector: 'node[[degree >= 1120]][[degree <= 1125]]',
+      style: {
+        'height': '153.84988203702',
+        'width': '153.84988203702'
+      }
+    },{
+      selector: 'node[[degree >= 1125]][[degree <= 1130]]',
+      style: {
+        'height': '154.0041911526',
+        'width': '154.0041911526'
+      }
+    },{
+      selector: 'node[[degree >= 1130]][[degree <= 1135]]',
+      style: {
+        'height': '154.15804373066',
+        'width': '154.15804373066'
+      }
+    },{
+      selector: 'node[[degree >= 1135]][[degree <= 1140]]',
+      style: {
+        'height': '154.31144313306',
+        'width': '154.31144313306'
+      }
+    },{
+      selector: 'node[[degree >= 1140]][[degree <= 1145]]',
+      style: {
+        'height': '154.46439268223',
+        'width': '154.46439268223'
+      }
+    },{
+      selector: 'node[[degree >= 1145]][[degree <= 1150]]',
+      style: {
+        'height': '154.61689566179',
+        'width': '154.61689566179'
+      }
+    },{
+      selector: 'node[[degree >= 1150]][[degree <= 1155]]',
+      style: {
+        'height': '154.76895531716',
+        'width': '154.76895531716'
+      }
+    },{
+      selector: 'node[[degree >= 1155]][[degree <= 1160]]',
+      style: {
+        'height': '154.92057485623',
+        'width': '154.92057485623'
+      }
+    },{
+      selector: 'node[[degree >= 1160]][[degree <= 1165]]',
+      style: {
+        'height': '155.07175744986',
+        'width': '155.07175744986'
+      }
+    },{
+      selector: 'node[[degree >= 1165]][[degree <= 1170]]',
+      style: {
+        'height': '155.22250623255',
+        'width': '155.22250623255'
+      }
+    },{
+      selector: 'node[[degree >= 1170]][[degree <= 1175]]',
+      style: {
+        'height': '155.37282430296',
+        'width': '155.37282430296'
+      }
+    },{
+      selector: 'node[[degree >= 1175]][[degree <= 1180]]',
+      style: {
+        'height': '155.52271472451',
+        'width': '155.52271472451'
+      }
+    },{
+      selector: 'node[[degree >= 1180]][[degree <= 1185]]',
+      style: {
+        'height': '155.67218052587',
+        'width': '155.67218052587'
+      }
+    },{
+      selector: 'node[[degree >= 1185]][[degree <= 1190]]',
+      style: {
+        'height': '155.82122470157',
+        'width': '155.82122470157'
+      }
+    },{
+      selector: 'node[[degree >= 1190]][[degree <= 1195]]',
+      style: {
+        'height': '155.96985021248',
+        'width': '155.96985021248'
+      }
+    },{
+      selector: 'node[[degree >= 1195]][[degree <= 1200]]',
+      style: {
+        'height': '156.11805998634',
+        'width': '156.11805998634'
+      }
+    },{
+      selector: 'node[[degree >= 1200]][[degree <= 1205]]',
+      style: {
+        'height': '156.26585691826',
+        'width': '156.26585691826'
+      }
+    },{
+      selector: 'node[[degree >= 1205]][[degree <= 1210]]',
+      style: {
+        'height': '156.41324387125',
+        'width': '156.41324387125'
+      }
+    },{
+      selector: 'node[[degree >= 1210]][[degree <= 1215]]',
+      style: {
+        'height': '156.56022367666',
+        'width': '156.56022367666'
+      }
+    },{
+      selector: 'node[[degree >= 1215]][[degree <= 1220]]',
+      style: {
+        'height': '156.7067991347',
+        'width': '156.7067991347'
+      }
+    },{
+      selector: 'node[[degree >= 1220]][[degree <= 1225]]',
+      style: {
+        'height': '156.85297301489',
+        'width': '156.85297301489'
+      }
+    },{
+      selector: 'node[[degree >= 1225]][[degree <= 1230]]',
+      style: {
+        'height': '156.99874805651',
+        'width': '156.99874805651'
+      }
+    },{
+      selector: 'node[[degree >= 1230]][[degree <= 1235]]',
+      style: {
+        'height': '157.14412696908',
+        'width': '157.14412696908'
+      }
+    },{
+      selector: 'node[[degree >= 1235]][[degree <= 1240]]',
+      style: {
+        'height': '157.28911243278',
+        'width': '157.28911243278'
+      }
+    },{
+      selector: 'node[[degree >= 1240]][[degree <= 1245]]',
+      style: {
+        'height': '157.4337070989',
+        'width': '157.4337070989'
+      }
+    },{
+      selector: 'node[[degree >= 1245]][[degree <= 1250]]',
+      style: {
+        'height': '157.57791359025',
+        'width': '157.57791359025'
+      }
+    },{
+      selector: 'node[[degree >= 1250]][[degree <= 1255]]',
+      style: {
+        'height': '157.72173450159',
+        'width': '157.72173450159'
+      }
+    },{
+      selector: 'node[[degree >= 1255]][[degree <= 1260]]',
+      style: {
+        'height': '157.86517240006',
+        'width': '157.86517240006'
+      }
+    },{
+      selector: 'node[[degree >= 1260]][[degree <= 1265]]',
+      style: {
+        'height': '158.00822982553',
+        'width': '158.00822982553'
+      }
+    },{
+      selector: 'node[[degree >= 1265]][[degree <= 1270]]',
+      style: {
+        'height': '158.15090929105',
+        'width': '158.15090929105'
+      }
+    },{
+      selector: 'node[[degree >= 1270]][[degree <= 1275]]',
+      style: {
+        'height': '158.2932132832',
+        'width': '158.2932132832'
+      }
+    },{
+      selector: 'node[[degree >= 1275]][[degree <= 1280]]',
+      style: {
+        'height': '158.43514426251',
+        'width': '158.43514426251'
+      }
+    },{
+      selector: 'node[[degree >= 1280]][[degree <= 1285]]',
+      style: {
+        'height': '158.5767046638',
+        'width': '158.5767046638'
+      }
+    },{
+      selector: 'node[[degree >= 1285]][[degree <= 1290]]',
+      style: {
+        'height': '158.71789689655',
+        'width': '158.71789689655'
+      }
+    },{
+      selector: 'node[[degree >= 1290]][[degree <= 1295]]',
+      style: {
+        'height': '158.85872334529',
+        'width': '158.85872334529'
+      }
+    },{
+      selector: 'node[[degree >= 1295]][[degree <= 1300]]',
+      style: {
+        'height': '158.99918636993',
+        'width': '158.99918636993'
+      }
+    },{
+      selector: 'node[[degree >= 1300]][[degree <= 1305]]',
+      style: {
+        'height': '159.13928830611',
+        'width': '159.13928830611'
+      }
+    },{
+      selector: 'node[[degree >= 1305]][[degree <= 1310]]',
+      style: {
+        'height': '159.27903146554',
+        'width': '159.27903146554'
+      }
+    },{
+      selector: 'node[[degree >= 1310]][[degree <= 1315]]',
+      style: {
+        'height': '159.41841813635',
+        'width': '159.41841813635'
+      }
+    },{
+      selector: 'node[[degree >= 1315]][[degree <= 1320]]',
+      style: {
+        'height': '159.55745058341',
+        'width': '159.55745058341'
+      }
+    },{
+      selector: 'node[[degree >= 1320]][[degree <= 1325]]',
+      style: {
+        'height': '159.69613104865',
+        'width': '159.69613104865'
+      }
+    },{
+      selector: 'node[[degree >= 1325]][[degree <= 1330]]',
+      style: {
+        'height': '159.83446175139',
+        'width': '159.83446175139'
+      }
+    },{
+      selector: 'node[[degree >= 1330]][[degree <= 1335]]',
+      style: {
+        'height': '159.97244488863',
+        'width': '159.97244488863'
+      }
+    },{
+      selector: 'node[[degree >= 1335]][[degree <= 1340]]',
+      style: {
+        'height': '160.11008263538',
+        'width': '160.11008263538'
+      }
+    },{
+      selector: 'node[[degree >= 1340]][[degree <= 1345]]',
+      style: {
+        'height': '160.24737714497',
+        'width': '160.24737714497'
+      }
+    },{
+      selector: 'node[[degree >= 1345]][[degree <= 1350]]',
+      style: {
+        'height': '160.38433054931',
+        'width': '160.38433054931'
+      }
+    },{
+      selector: 'node[[degree >= 1350]][[degree <= 1355]]',
+      style: {
+        'height': '160.52094495921',
+        'width': '160.52094495921'
+      }
+    },{
+      selector: 'node[[degree >= 1355]][[degree <= 1360]]',
+      style: {
+        'height': '160.65722246465',
+        'width': '160.65722246465'
+      }
+    },{
+      selector: 'node[[degree >= 1360]][[degree <= 1365]]',
+      style: {
+        'height': '160.79316513509',
+        'width': '160.79316513509'
+      }
+    },{
+      selector: 'node[[degree >= 1365]][[degree <= 1370]]',
+      style: {
+        'height': '160.9287750197',
+        'width': '160.9287750197'
+      }
+    },{
+      selector: 'node[[degree >= 1370]][[degree <= 1375]]',
+      style: {
+        'height': '161.06405414767',
+        'width': '161.06405414767'
+      }
+    },{
+      selector: 'node[[degree >= 1375]][[degree <= 1380]]',
+      style: {
+        'height': '161.19900452847',
+        'width': '161.19900452847'
+      }
+    },{
+      selector: 'node[[degree >= 1380]][[degree <= 1385]]',
+      style: {
+        'height': '161.3336281521',
+        'width': '161.3336281521'
+      }
+    },{
+      selector: 'node[[degree >= 1385]][[degree <= 1390]]',
+      style: {
+        'height': '161.46792698935',
+        'width': '161.46792698935'
+      }
+    },{
+      selector: 'node[[degree >= 1390]][[degree <= 1395]]',
+      style: {
+        'height': '161.60190299209',
+        'width': '161.60190299209'
+      }
+    },{
+      selector: 'node[[degree >= 1395]][[degree <= 1400]]',
+      style: {
+        'height': '161.73555809346',
+        'width': '161.73555809346'
+      }
+    },{
+      selector: 'node[[degree >= 1400]][[degree <= 1405]]',
+      style: {
+        'height': '161.86889420814',
+        'width': '161.86889420814'
+      }
+    },{
+      selector: 'node[[degree >= 1405]][[degree <= 1410]]',
+      style: {
+        'height': '162.00191323262',
+        'width': '162.00191323262'
+      }
+    },{
+      selector: 'node[[degree >= 1410]][[degree <= 1415]]',
+      style: {
+        'height': '162.13461704541',
+        'width': '162.13461704541'
+      }
+    },{
+      selector: 'node[[degree >= 1415]][[degree <= 1420]]',
+      style: {
+        'height': '162.26700750726',
+        'width': '162.26700750726'
+      }
+    },{
+      selector: 'node[[degree >= 1420]][[degree <= 1425]]',
+      style: {
+        'height': '162.39908646142',
+        'width': '162.39908646142'
+      }
+    },{
+      selector: 'node[[degree >= 1425]][[degree <= 1430]]',
+      style: {
+        'height': '162.53085573386',
+        'width': '162.53085573386'
+      }
+    },{
+      selector: 'node[[degree >= 1430]][[degree <= 1435]]',
+      style: {
+        'height': '162.66231713346',
+        'width': '162.66231713346'
+      }
+    },{
+      selector: 'node[[degree >= 1435]][[degree <= 1440]]',
+      style: {
+        'height': '162.79347245227',
+        'width': '162.79347245227'
+      }
+    },{
+      selector: 'node[[degree >= 1440]][[degree <= 1445]]',
+      style: {
+        'height': '162.92432346572',
+        'width': '162.92432346572'
+      }
+    },{
+      selector: 'node[[degree >= 1445]][[degree <= 1450]]',
+      style: {
+        'height': '163.0548719328',
+        'width': '163.0548719328'
+      }
+    },{
+      selector: 'node[[degree >= 1450]][[degree <= 1455]]',
+      style: {
+        'height': '163.1851195963',
+        'width': '163.1851195963'
+      }
+    },{
+      selector: 'node[[degree >= 1455]][[degree <= 1460]]',
+      style: {
+        'height': '163.31506818298',
+        'width': '163.31506818298'
+      }
+    },{
+      selector: 'node[[degree >= 1460]][[degree <= 1465]]',
+      style: {
+        'height': '163.44471940383',
+        'width': '163.44471940383'
+      }
+    },{
+      selector: 'node[[degree >= 1465]][[degree <= 1470]]',
+      style: {
+        'height': '163.5740749542',
+        'width': '163.5740749542'
+      }
+    },{
+      selector: 'node[[degree >= 1470]][[degree <= 1475]]',
+      style: {
+        'height': '163.70313651406',
+        'width': '163.70313651406'
+      }
+    },{
+      selector: 'node[[degree >= 1475]][[degree <= 1480]]',
+      style: {
+        'height': '163.83190574813',
+        'width': '163.83190574813'
+      }
+    },{
+      selector: 'node[[degree >= 1480]][[degree <= 1485]]',
+      style: {
+        'height': '163.9603843061',
+        'width': '163.9603843061'
+      }
+    },{
+      selector: 'node[[degree >= 1485]][[degree <= 1490]]',
+      style: {
+        'height': '164.08857382284',
+        'width': '164.08857382284'
+      }
+    },{
+      selector: 'node[[degree >= 1490]][[degree <= 1495]]',
+      style: {
+        'height': '164.21647591854',
+        'width': '164.21647591854'
+      }
+    },{
+      selector: 'node[[degree >= 1495]][[degree <= 1500]]',
+      style: {
+        'height': '164.3440921989',
+        'width': '164.3440921989'
+      }
+    },{
+      selector: 'node[[degree >= 1500]][[degree <= 1505]]',
+      style: {
+        'height': '164.47142425533',
+        'width': '164.47142425533'
+      }
+    },{
+      selector: 'node[[degree >= 1505]][[degree <= 1510]]',
+      style: {
+        'height': '164.59847366511',
+        'width': '164.59847366511'
+      }
+    },{
+      selector: 'node[[degree >= 1510]][[degree <= 1515]]',
+      style: {
+        'height': '164.72524199155',
+        'width': '164.72524199155'
+      }
+    },{
+      selector: 'node[[degree >= 1515]][[degree <= 1520]]',
+      style: {
+        'height': '164.85173078418',
+        'width': '164.85173078418'
+      }
+    },{
+      selector: 'node[[degree >= 1520]][[degree <= 1525]]',
+      style: {
+        'height': '164.9779415789',
+        'width': '164.9779415789'
+      }
+    },{
+      selector: 'node[[degree >= 1525]][[degree <= 1530]]',
+      style: {
+        'height': '165.10387589816',
+        'width': '165.10387589816'
+      }
+    },{
+      selector: 'node[[degree >= 1530]][[degree <= 1535]]',
+      style: {
+        'height': '165.22953525111',
+        'width': '165.22953525111'
+      }
+    },{
+      selector: 'node[[degree >= 1535]][[degree <= 1540]]',
+      style: {
+        'height': '165.35492113376',
+        'width': '165.35492113376'
+      }
+    },{
+      selector: 'node[[degree >= 1540]][[degree <= 1545]]',
+      style: {
+        'height': '165.48003502915',
+        'width': '165.48003502915'
+      }
+    },{
+      selector: 'node[[degree >= 1545]][[degree <= 1550]]',
+      style: {
+        'height': '165.60487840749',
+        'width': '165.60487840749'
+      }
+    },{
+      selector: 'node[[degree >= 1550]][[degree <= 1555]]',
+      style: {
+        'height': '165.72945272629',
+        'width': '165.72945272629'
+      }
+    },{
+      selector: 'node[[degree >= 1555]][[degree <= 1560]]',
+      style: {
+        'height': '165.85375943058',
+        'width': '165.85375943058'
+      }
+    },{
+      selector: 'node[[degree >= 1560]][[degree <= 1565]]',
+      style: {
+        'height': '165.97779995298',
+        'width': '165.97779995298'
+      }
+    },{
+      selector: 'node[[degree >= 1565]][[degree <= 1570]]',
+      style: {
+        'height': '166.10157571389',
+        'width': '166.10157571389'
+      }
+    },{
+      selector: 'node[[degree >= 1570]][[degree <= 1575]]',
+      style: {
+        'height': '166.22508812162',
+        'width': '166.22508812162'
+      }
+    },{
+      selector: 'node[[degree >= 1575]][[degree <= 1580]]',
+      style: {
+        'height': '166.34833857253',
+        'width': '166.34833857253'
+      }
+    },{
+      selector: 'node[[degree >= 1580]][[degree <= 1585]]',
+      style: {
+        'height': '166.47132845118',
+        'width': '166.47132845118'
+      }
+    },{
+      selector: 'node[[degree >= 1585]][[degree <= 1590]]',
+      style: {
+        'height': '166.59405913044',
+        'width': '166.59405913044'
+      }
+    },{
+      selector: 'node[[degree >= 1590]][[degree <= 1595]]',
+      style: {
+        'height': '166.71653197167',
+        'width': '166.71653197167'
+      }
+    },{
+      selector: 'node[[degree >= 1595]][[degree <= 1600]]',
+      style: {
+        'height': '166.83874832481',
+        'width': '166.83874832481'
+      }
+    },{
+      selector: 'node[[degree >= 1600]][[degree <= 1605]]',
+      style: {
+        'height': '166.96070952851',
+        'width': '166.96070952851'
+      }
+    },{
+      selector: 'node[[degree >= 1605]][[degree <= 1610]]',
+      style: {
+        'height': '167.08241691032',
+        'width': '167.08241691032'
+      }
+    },{
+      selector: 'node[[degree >= 1610]][[degree <= 1615]]',
+      style: {
+        'height': '167.20387178673',
+        'width': '167.20387178673'
+      }
+    },{
+      selector: 'node[[degree >= 1615]][[degree <= 1620]]',
+      style: {
+        'height': '167.32507546336',
+        'width': '167.32507546336'
+      }
+    },{
+      selector: 'node[[degree >= 1620]][[degree <= 1625]]',
+      style: {
+        'height': '167.44602923507',
+        'width': '167.44602923507'
+      }
+    },{
+      selector: 'node[[degree >= 1625]][[degree <= 1630]]',
+      style: {
+        'height': '167.56673438604',
+        'width': '167.56673438604'
+      }
+    },{
+      selector: 'node[[degree >= 1630]][[degree <= 1635]]',
+      style: {
+        'height': '167.68719218996',
+        'width': '167.68719218996'
+      }
+    },{
+      selector: 'node[[degree >= 1635]][[degree <= 1640]]',
+      style: {
+        'height': '167.80740391009',
+        'width': '167.80740391009'
+      }
+    },{
+      selector: 'node[[degree >= 1640]][[degree <= 1645]]',
+      style: {
+        'height': '167.92737079941',
+        'width': '167.92737079941'
+      }
+    },{
+      selector: 'node[[degree >= 1645]][[degree <= 1650]]',
+      style: {
+        'height': '168.04709410072',
+        'width': '168.04709410072'
+      }
+    },{
+      selector: 'node[[degree >= 1650]][[degree <= 1655]]',
+      style: {
+        'height': '168.16657504675',
+        'width': '168.16657504675'
+      }
+    },{
+      selector: 'node[[degree >= 1655]][[degree <= 1660]]',
+      style: {
+        'height': '168.28581486029',
+        'width': '168.28581486029'
+      }
+    },{
+      selector: 'node[[degree >= 1660]][[degree <= 1665]]',
+      style: {
+        'height': '168.40481475429',
+        'width': '168.40481475429'
+      }
+    },{
+      selector: 'node[[degree >= 1665]][[degree <= 1670]]',
+      style: {
+        'height': '168.52357593195',
+        'width': '168.52357593195'
+      }
+    },{
+      selector: 'node[[degree >= 1670]][[degree <= 1675]]',
+      style: {
+        'height': '168.64209958686',
+        'width': '168.64209958686'
+      }
+    },{
+      selector: 'node[[degree >= 1675]][[degree <= 1680]]',
+      style: {
+        'height': '168.76038690308',
+        'width': '168.76038690308'
+      }
+    },{
+      selector: 'node[[degree >= 1680]][[degree <= 1685]]',
+      style: {
+        'height': '168.87843905526',
+        'width': '168.87843905526'
+      }
+    },{
+      selector: 'node[[degree >= 1685]][[degree <= 1690]]',
+      style: {
+        'height': '168.99625720874',
+        'width': '168.99625720874'
+      }
+    },{
+      selector: 'node[[degree >= 1690]][[degree <= 1695]]',
+      style: {
+        'height': '169.11384251964',
+        'width': '169.11384251964'
+      }
+    },{
+      selector: 'node[[degree >= 1695]][[degree <= 1700]]',
+      style: {
+        'height': '169.23119613497',
+        'width': '169.23119613497'
+      }
+    },{
+      selector: 'node[[degree >= 1700]][[degree <= 1705]]',
+      style: {
+        'height': '169.34831919273',
+        'width': '169.34831919273'
+      }
+    },{
+      selector: 'node[[degree >= 1705]][[degree <= 1710]]',
+      style: {
+        'height': '169.465212822',
+        'width': '169.465212822'
+      }
+    },{
+      selector: 'node[[degree >= 1710]][[degree <= 1715]]',
+      style: {
+        'height': '169.58187814303',
+        'width': '169.58187814303'
+      }
+    },{
+      selector: 'node[[degree >= 1715]][[degree <= 1720]]',
+      style: {
+        'height': '169.69831626737',
+        'width': '169.69831626737'
+      }
+    },{
+      selector: 'node[[degree >= 1720]][[degree <= 1725]]',
+      style: {
+        'height': '169.8145282979',
+        'width': '169.8145282979'
+      }
+    },{
+      selector: 'node[[degree >= 1725]][[degree <= 1730]]',
+      style: {
+        'height': '169.93051532899',
+        'width': '169.93051532899'
+      }
+    },{
+      selector: 'node[[degree >= 1730]][[degree <= 1735]]',
+      style: {
+        'height': '170.04627844655',
+        'width': '170.04627844655'
+      }
+    },{
+      selector: 'node[[degree >= 1735]][[degree <= 1740]]',
+      style: {
+        'height': '170.16181872811',
+        'width': '170.16181872811'
+      }
+    },{
+      selector: 'node[[degree >= 1740]][[degree <= 1745]]',
+      style: {
+        'height': '170.27713724296',
+        'width': '170.27713724296'
+      }
+    },{
+      selector: 'node[[degree >= 1745]][[degree <= 1750]]',
+      style: {
+        'height': '170.39223505218',
+        'width': '170.39223505218'
+      }
+    },{
+      selector: 'node[[degree >= 1750]][[degree <= 1755]]',
+      style: {
+        'height': '170.50711320876',
+        'width': '170.50711320876'
+      }
+    },{
+      selector: 'node[[degree >= 1755]][[degree <= 1760]]',
+      style: {
+        'height': '170.62177275767',
+        'width': '170.62177275767'
+      }
+    },{
+      selector: 'node[[degree >= 1760]][[degree <= 1765]]',
+      style: {
+        'height': '170.73621473595',
+        'width': '170.73621473595'
+      }
+    },{
+      selector: 'node[[degree >= 1765]][[degree <= 1770]]',
+      style: {
+        'height': '170.8504401728',
+        'width': '170.8504401728'
+      }
+    },{
+      selector: 'node[[degree >= 1770]][[degree <= 1775]]',
+      style: {
+        'height': '170.96445008963',
+        'width': '170.96445008963'
+      }
+    },{
+      selector: 'node[[degree >= 1775]][[degree <= 1780]]',
+      style: {
+        'height': '171.07824550019',
+        'width': '171.07824550019'
+      }
+    },{
+      selector: 'node[[degree >= 1780]][[degree <= 1785]]',
+      style: {
+        'height': '171.1918274106',
+        'width': '171.1918274106'
+      }
+    },{
+      selector: 'node[[degree >= 1785]][[degree <= 1790]]',
+      style: {
+        'height': '171.30519681947',
+        'width': '171.30519681947'
+      }
+    },{
+      selector: 'node[[degree >= 1790]][[degree <= 1795]]',
+      style: {
+        'height': '171.41835471794',
+        'width': '171.41835471794'
+      }
+    },{
+      selector: 'node[[degree >= 1795]][[degree <= 1800]]',
+      style: {
+        'height': '171.53130208978',
+        'width': '171.53130208978'
+      }
+    },{
+      selector: 'node[[degree >= 1800]][[degree <= 1805]]',
+      style: {
+        'height': '171.64403991147',
+        'width': '171.64403991147'
+      }
+    },{
+      selector: 'node[[degree >= 1805]][[degree <= 1810]]',
+      style: {
+        'height': '171.75656915224',
+        'width': '171.75656915224'
+      }
+    },{
+      selector: 'node[[degree >= 1810]][[degree <= 1815]]',
+      style: {
+        'height': '171.8688907742',
+        'width': '171.8688907742'
+      }
+    },{
+      selector: 'node[[degree >= 1815]][[degree <= 1820]]',
+      style: {
+        'height': '171.98100573234',
+        'width': '171.98100573234'
+      }
+    },{
+      selector: 'node[[degree >= 1820]][[degree <= 1825]]',
+      style: {
+        'height': '172.09291497468',
+        'width': '172.09291497468'
+      }
+    },{
+      selector: 'node[[degree >= 1825]][[degree <= 1830]]',
+      style: {
+        'height': '172.20461944227',
+        'width': '172.20461944227'
+      }
+    },{
+      selector: 'node[[degree >= 1830]][[degree <= 1835]]',
+      style: {
+        'height': '172.31612006931',
+        'width': '172.31612006931'
+      }
+    },{
+      selector: 'node[[degree >= 1835]][[degree <= 1840]]',
+      style: {
+        'height': '172.42741778319',
+        'width': '172.42741778319'
+      }
+    },{
+      selector: 'node[[degree >= 1840]][[degree <= 1845]]',
+      style: {
+        'height': '172.53851350457',
+        'width': '172.53851350457'
+      }
+    },{
+      selector: 'node[[degree >= 1845]][[degree <= 1850]]',
+      style: {
+        'height': '172.64940814745',
+        'width': '172.64940814745'
+      }
+    },{
+      selector: 'node[[degree >= 1850]][[degree <= 1855]]',
+      style: {
+        'height': '172.76010261921',
+        'width': '172.76010261921'
+      }
+    },{
+      selector: 'node[[degree >= 1855]][[degree <= 1860]]',
+      style: {
+        'height': '172.87059782074',
+        'width': '172.87059782074'
+      }
+    },{
+      selector: 'node[[degree >= 1860]][[degree <= 1865]]',
+      style: {
+        'height': '172.98089464641',
+        'width': '172.98089464641'
+      }
+    },{
+      selector: 'node[[degree >= 1865]][[degree <= 1870]]',
+      style: {
+        'height': '173.09099398422',
+        'width': '173.09099398422'
+      }
+    },{
+      selector: 'node[[degree >= 1870]][[degree <= 1875]]',
+      style: {
+        'height': '173.2008967158',
+        'width': '173.2008967158'
+      }
+    },{
+      selector: 'node[[degree >= 1875]][[degree <= 1880]]',
+      style: {
+        'height': '173.31060371652',
+        'width': '173.31060371652'
+      }
+    },{
+      selector: 'node[[degree >= 1880]][[degree <= 1885]]',
+      style: {
+        'height': '173.42011585553',
+        'width': '173.42011585553'
+      }
+    },{
+      selector: 'node[[degree >= 1885]][[degree <= 1890]]',
+      style: {
+        'height': '173.52943399582',
+        'width': '173.52943399582'
+      }
+    },{
+      selector: 'node[[degree >= 1890]][[degree <= 1895]]',
+      style: {
+        'height': '173.63855899426',
+        'width': '173.63855899426'
+      }
+    },{
+      selector: 'node[[degree >= 1895]][[degree <= 1900]]',
+      style: {
+        'height': '173.7474917017',
+        'width': '173.7474917017'
+      }
+    },{
+      selector: 'node[[degree >= 1900]][[degree <= 1905]]',
+      style: {
+        'height': '173.85623296302',
+        'width': '173.85623296302'
+      }
+    },{
+      selector: 'node[[degree >= 1905]][[degree <= 1910]]',
+      style: {
+        'height': '173.96478361714',
+        'width': '173.96478361714'
+      }
+    },{
+      selector: 'node[[degree >= 1910]][[degree <= 1915]]',
+      style: {
+        'height': '174.07314449716',
+        'width': '174.07314449716'
+      }
+    },{
+      selector: 'node[[degree >= 1915]][[degree <= 1920]]',
+      style: {
+        'height': '174.18131643033',
+        'width': '174.18131643033'
+      }
+    },{
+      selector: 'node[[degree >= 1920]][[degree <= 1925]]',
+      style: {
+        'height': '174.28930023815',
+        'width': '174.28930023815'
+      }
+    },{
+      selector: 'node[[degree >= 1925]][[degree <= 1930]]',
+      style: {
+        'height': '174.39709673645',
+        'width': '174.39709673645'
+      }
+    },{
+      selector: 'node[[degree >= 1930]][[degree <= 1935]]',
+      style: {
+        'height': '174.50470673539',
+        'width': '174.50470673539'
+      }
+    },{
+      selector: 'node[[degree >= 1935]][[degree <= 1940]]',
+      style: {
+        'height': '174.61213103953',
+        'width': '174.61213103953'
+      }
+    },{
+      selector: 'node[[degree >= 1940]][[degree <= 1945]]',
+      style: {
+        'height': '174.71937044791',
+        'width': '174.71937044791'
+      }
+    },{
+      selector: 'node[[degree >= 1945]][[degree <= 1950]]',
+      style: {
+        'height': '174.82642575408',
+        'width': '174.82642575408'
+      }
+    },{
+      selector: 'node[[degree >= 1950]][[degree <= 1955]]',
+      style: {
+        'height': '174.93329774614',
+        'width': '174.93329774614'
+      }
+    },{
+      selector: 'node[[degree >= 1955]][[degree <= 1960]]',
+      style: {
+        'height': '175.03998720682',
+        'width': '175.03998720682'
+      }
+    },{
+      selector: 'node[[degree >= 1960]][[degree <= 1965]]',
+      style: {
+        'height': '175.14649491352',
+        'width': '175.14649491352'
+      }
+    },{
+      selector: 'node[[degree >= 1965]][[degree <= 1970]]',
+      style: {
+        'height': '175.25282163834',
+        'width': '175.25282163834'
+      }
+    },{
+      selector: 'node[[degree >= 1970]][[degree <= 1975]]',
+      style: {
+        'height': '175.35896814815',
+        'width': '175.35896814815'
+      }
+    },{
+      selector: 'node[[degree >= 1975]][[degree <= 1980]]',
+      style: {
+        'height': '175.46493520465',
+        'width': '175.46493520465'
+      }
+    },{
+      selector: 'node[[degree >= 1980]][[degree <= 1985]]',
+      style: {
+        'height': '175.57072356439',
+        'width': '175.57072356439'
+      }
+    },{
+      selector: 'node[[degree >= 1985]][[degree <= 1990]]',
+      style: {
+        'height': '175.67633397882',
+        'width': '175.67633397882'
+      }
+    },{
+      selector: 'node[[degree >= 1990]][[degree <= 1995]]',
+      style: {
+        'height': '175.78176719435',
+        'width': '175.78176719435'
+      }
+    },{
+      selector: 'node[[degree >= 1995]][[degree <= 2000]]',
+      style: {
+        'height': '175.88702395242',
+        'width': '175.88702395242'
+      }
+    },{
+      selector: 'node[[degree >= 2000]][[degree <= 2005]]',
+      style: {
+        'height': '175.99210498949',
+        'width': '175.99210498949'
+      }
+    },{
+      selector: 'node[[degree >= 2005]][[degree <= 2010]]',
+      style: {
+        'height': '176.09701103711',
+        'width': '176.09701103711'
+      }
+    },{
+      selector: 'node[[degree >= 2010]][[degree <= 2015]]',
+      style: {
+        'height': '176.201742822',
+        'width': '176.201742822'
+      }
+    },{
+      selector: 'node[[degree >= 2015]][[degree <= 2020]]',
+      style: {
+        'height': '176.30630106603',
+        'width': '176.30630106603'
+      }
+    },{
+      selector: 'node[[degree >= 2020]][[degree <= 2025]]',
+      style: {
+        'height': '176.41068648633',
+        'width': '176.41068648633'
+      }
+    },{
+      selector: 'node[[degree >= 2025]][[degree <= 2030]]',
+      style: {
+        'height': '176.51489979526',
+        'width': '176.51489979526'
+      }
+    },{
+      selector: 'node[[degree >= 2030]][[degree <= 2035]]',
+      style: {
+        'height': '176.61894170054',
+        'width': '176.61894170054'
+      }
+    },{
+      selector: 'node[[degree >= 2035]][[degree <= 2040]]',
+      style: {
+        'height': '176.7228129052',
+        'width': '176.7228129052'
+      }
+    },{
+      selector: 'node[[degree >= 2040]][[degree <= 2045]]',
+      style: {
+        'height': '176.8265141077',
+        'width': '176.8265141077'
+      }
+    },{
+      selector: 'node[[degree >= 2045]][[degree <= 2050]]',
+      style: {
+        'height': '176.93004600193',
+        'width': '176.93004600193'
+      }
+    },{
+      selector: 'node[[degree >= 2050]][[degree <= 2055]]',
+      style: {
+        'height': '177.03340927725',
+        'width': '177.03340927725'
+      }
+    },{
+      selector: 'node[[degree >= 2055]][[degree <= 2060]]',
+      style: {
+        'height': '177.13660461855',
+        'width': '177.13660461855'
+      }
+    },{
+      selector: 'node[[degree >= 2060]][[degree <= 2065]]',
+      style: {
+        'height': '177.23963270628',
+        'width': '177.23963270628'
+      }
+    },{
+      selector: 'node[[degree >= 2065]][[degree <= 2070]]',
+      style: {
+        'height': '177.34249421648',
+        'width': '177.34249421648'
+      }
+    },{
+      selector: 'node[[degree >= 2070]][[degree <= 2075]]',
+      style: {
+        'height': '177.44518982084',
+        'width': '177.44518982084'
+      }
+    },{
+      selector: 'node[[degree >= 2075]][[degree <= 2080]]',
+      style: {
+        'height': '177.54772018672',
+        'width': '177.54772018672'
+      }
+    },{
+      selector: 'node[[degree >= 2080]][[degree <= 2085]]',
+      style: {
+        'height': '177.6500859772',
+        'width': '177.6500859772'
+      }
+    },{
+      selector: 'node[[degree >= 2085]][[degree <= 2090]]',
+      style: {
+        'height': '177.7522878511',
+        'width': '177.7522878511'
+      }
+    },{
+      selector: 'node[[degree >= 2090]][[degree <= 2095]]',
+      style: {
+        'height': '177.85432646305',
+        'width': '177.85432646305'
+      }
+    },{
+      selector: 'node[[degree >= 2095]][[degree <= 2100]]',
+      style: {
+        'height': '177.9562024635',
+        'width': '177.9562024635'
+      }
+    },{
+      selector: 'node[[degree >= 2100]][[degree <= 2105]]',
+      style: {
+        'height': '178.05791649875',
+        'width': '178.05791649875'
+      }
+    },{
+      selector: 'node[[degree >= 2105]][[degree <= 2110]]',
+      style: {
+        'height': '178.15946921101',
+        'width': '178.15946921101'
+      }
+    },{
+      selector: 'node[[degree >= 2110]][[degree <= 2115]]',
+      style: {
+        'height': '178.26086123844',
+        'width': '178.26086123844'
+      }
+    },{
+      selector: 'node[[degree >= 2115]][[degree <= 2120]]',
+      style: {
+        'height': '178.36209321514',
+        'width': '178.36209321514'
+      }
+    },{
+      selector: 'node[[degree >= 2120]][[degree <= 2125]]',
+      style: {
+        'height': '178.46316577125',
+        'width': '178.46316577125'
+      }
+    },{
+      selector: 'node[[degree >= 2125]][[degree <= 2130]]',
+      style: {
+        'height': '178.56407953291',
+        'width': '178.56407953291'
+      }
+    },{
+      selector: 'node[[degree >= 2130]][[degree <= 2135]]',
+      style: {
+        'height': '178.66483512237',
+        'width': '178.66483512237'
+      }
+    },{
+      selector: 'node[[degree >= 2135]][[degree <= 2140]]',
+      style: {
+        'height': '178.76543315798',
+        'width': '178.76543315798'
+      }
+    },{
+      selector: 'node[[degree >= 2140]][[degree <= 2145]]',
+      style: {
+        'height': '178.86587425421',
+        'width': '178.86587425421'
+      }
+    },{
+      selector: 'node[[degree >= 2145]][[degree <= 2150]]',
+      style: {
+        'height': '178.96615902173',
+        'width': '178.96615902173'
+      }
+    },{
+      selector: 'node[[degree >= 2150]][[degree <= 2155]]',
+      style: {
+        'height': '179.0662880674',
+        'width': '179.0662880674'
+      }
+    },{
+      selector: 'node[[degree >= 2155]][[degree <= 2160]]',
+      style: {
+        'height': '179.16626199434',
+        'width': '179.16626199434'
+      }
+    },{
+      selector: 'node[[degree >= 2160]][[degree <= 2165]]',
+      style: {
+        'height': '179.26608140191',
+        'width': '179.26608140191'
+      }
+    },{
+      selector: 'node[[degree >= 2165]][[degree <= 2170]]',
+      style: {
+        'height': '179.36574688581',
+        'width': '179.36574688581'
+      }
+    },{
+      selector: 'node[[degree >= 2170]][[degree <= 2175]]',
+      style: {
+        'height': '179.46525903804',
+        'width': '179.46525903804'
+      }
+    },{
+      selector: 'node[[degree >= 2175]][[degree <= 2180]]',
+      style: {
+        'height': '179.56461844698',
+        'width': '179.56461844698'
+      }
+    },{
+      selector: 'node[[degree >= 2180]][[degree <= 2185]]',
+      style: {
+        'height': '179.66382569742',
+        'width': '179.66382569742'
+      }
+    },{
+      selector: 'node[[degree >= 2185]][[degree <= 2190]]',
+      style: {
+        'height': '179.76288137055',
+        'width': '179.76288137055'
+      }
+    },{
+      selector: 'node[[degree >= 2190]][[degree <= 2195]]',
+      style: {
+        'height': '179.86178604403',
+        'width': '179.86178604403'
+      }
+    },{
+      selector: 'node[[degree >= 2195]][[degree <= 2200]]',
+      style: {
+        'height': '179.96054029201',
+        'width': '179.96054029201'
+      }
+    },{
+      selector: 'node[[degree >= 2200]][[degree <= 2205]]',
+      style: {
+        'height': '180.05914468514',
+        'width': '180.05914468514'
+      }
+    },{
+      selector: 'node[[degree >= 2205]][[degree <= 2210]]',
+      style: {
+        'height': '180.15759979063',
+        'width': '180.15759979063'
+      }
+    },{
+      selector: 'node[[degree >= 2210]][[degree <= 2215]]',
+      style: {
+        'height': '180.25590617225',
+        'width': '180.25590617225'
+      }
+    },{
+      selector: 'node[[degree >= 2215]][[degree <= 2220]]',
+      style: {
+        'height': '180.35406439039',
+        'width': '180.35406439039'
+      }
+    },{
+      selector: 'node[[degree >= 2220]][[degree <= 2225]]',
+      style: {
+        'height': '180.45207500205',
+        'width': '180.45207500205'
+      }
+    },{
+      selector: 'node[[degree >= 2225]][[degree <= 2230]]',
+      style: {
+        'height': '180.54993856088',
+        'width': '180.54993856088'
+      }
+    },{
+      selector: 'node[[degree >= 2230]][[degree <= 2235]]',
+      style: {
+        'height': '180.64765561725',
+        'width': '180.64765561725'
+      }
+    },{
+      selector: 'node[[degree >= 2235]][[degree <= 2240]]',
+      style: {
+        'height': '180.7452267182',
+        'width': '180.7452267182'
+      }
+    },{
+      selector: 'node[[degree >= 2240]][[degree <= 2245]]',
+      style: {
+        'height': '180.84265240754',
+        'width': '180.84265240754'
+      }
+    },{
+      selector: 'node[[degree >= 2245]][[degree <= 2250]]',
+      style: {
+        'height': '180.93993322584',
+        'width': '180.93993322584'
+      }
+    },{
+      selector: 'node[[degree >= 2250]][[degree <= 2255]]',
+      style: {
+        'height': '181.03706971044',
+        'width': '181.03706971044'
+      }
+    },{
+      selector: 'node[[degree >= 2255]][[degree <= 2260]]',
+      style: {
+        'height': '181.13406239553',
+        'width': '181.13406239553'
+      }
+    },{
+      selector: 'node[[degree >= 2260]][[degree <= 2265]]',
+      style: {
+        'height': '181.23091181212',
+        'width': '181.23091181212'
+      }
+    },{
+      selector: 'node[[degree >= 2265]][[degree <= 2270]]',
+      style: {
+        'height': '181.3276184881',
+        'width': '181.3276184881'
+      }
+    },{
+      selector: 'node[[degree >= 2270]][[degree <= 2275]]',
+      style: {
+        'height': '181.42418294826',
+        'width': '181.42418294826'
+      }
+    },{
+      selector: 'node[[degree >= 2275]][[degree <= 2280]]',
+      style: {
+        'height': '181.52060571428',
+        'width': '181.52060571428'
+      }
+    },{
+      selector: 'node[[degree >= 2280]][[degree <= 2285]]',
+      style: {
+        'height': '181.61688730483',
+        'width': '181.61688730483'
+      }
+    },{
+      selector: 'node[[degree >= 2285]][[degree <= 2290]]',
+      style: {
+        'height': '181.71302823551',
+        'width': '181.71302823551'
+      }
+    },{
+      selector: 'node[[degree >= 2290]][[degree <= 2295]]',
+      style: {
+        'height': '181.80902901894',
+        'width': '181.80902901894'
+      }
+    },{
+      selector: 'node[[degree >= 2295]][[degree <= 2300]]',
+      style: {
+        'height': '181.90489016475',
+        'width': '181.90489016475'
+      }
+    },{
+      selector: 'node[[degree >= 2300]][[degree <= 2305]]',
+      style: {
+        'height': '182.00061217959',
+        'width': '182.00061217959'
+      }
+    },{
+      selector: 'node[[degree >= 2305]][[degree <= 2310]]',
+      style: {
+        'height': '182.09619556721',
+        'width': '182.09619556721'
+      }
+    },{
+      selector: 'node[[degree >= 2310]][[degree <= 2315]]',
+      style: {
+        'height': '182.19164082843',
+        'width': '182.19164082843'
+      }
+    },{
+      selector: 'node[[degree >= 2315]][[degree <= 2320]]',
+      style: {
+        'height': '182.28694846118',
+        'width': '182.28694846118'
+      }
+    },{
+      selector: 'node[[degree >= 2320]][[degree <= 2325]]',
+      style: {
+        'height': '182.38211896052',
+        'width': '182.38211896052'
+      }
+    },{
+      selector: 'node[[degree >= 2325]][[degree <= 2330]]',
+      style: {
+        'height': '182.47715281869',
+        'width': '182.47715281869'
+      }
+    },{
+      selector: 'node[[degree >= 2330]][[degree <= 2335]]',
+      style: {
+        'height': '182.57205052508',
+        'width': '182.57205052508'
+      }
+    },{
+      selector: 'node[[degree >= 2335]][[degree <= 2340]]',
+      style: {
+        'height': '182.6668125663',
+        'width': '182.6668125663'
+      }
+    },{
+      selector: 'node[[degree >= 2340]][[degree <= 2345]]',
+      style: {
+        'height': '182.76143942618',
+        'width': '182.76143942618'
+      }
+    },{
+      selector: 'node[[degree >= 2345]][[degree <= 2350]]',
+      style: {
+        'height': '182.85593158578',
+        'width': '182.85593158578'
+      }
+    },{
+      selector: 'node[[degree >= 2350]][[degree <= 2355]]',
+      style: {
+        'height': '182.95028952346',
+        'width': '182.95028952346'
+      }
+    },{
+      selector: 'node[[degree >= 2355]][[degree <= 2360]]',
+      style: {
+        'height': '183.04451371483',
+        'width': '183.04451371483'
+      }
+    },{
+      selector: 'node[[degree >= 2360]][[degree <= 2365]]',
+      style: {
+        'height': '183.13860463284',
+        'width': '183.13860463284'
+      }
+    },{
+      selector: 'node[[degree >= 2365]][[degree <= 2370]]',
+      style: {
+        'height': '183.23256274774',
+        'width': '183.23256274774'
+      }
+    },{
+      selector: 'node[[degree >= 2370]][[degree <= 2375]]',
+      style: {
+        'height': '183.32638852717',
+        'width': '183.32638852717'
+      }
+    },{
+      selector: 'node[[degree >= 2375]][[degree <= 2380]]',
+      style: {
+        'height': '183.4200824361',
+        'width': '183.4200824361'
+      }
+    },{
+      selector: 'node[[degree >= 2380]][[degree <= 2385]]',
+      style: {
+        'height': '183.51364493691',
+        'width': '183.51364493691'
+      }
+    },{
+      selector: 'node[[degree >= 2385]][[degree <= 2390]]',
+      style: {
+        'height': '183.6070764894',
+        'width': '183.6070764894'
+      }
+    },{
+      selector: 'node[[degree >= 2390]][[degree <= 2395]]',
+      style: {
+        'height': '183.70037755079',
+        'width': '183.70037755079'
+      }
+    },{
+      selector: 'node[[degree >= 2395]][[degree <= 2400]]',
+      style: {
+        'height': '183.79354857576',
+        'width': '183.79354857576'
+      }
+    },{
+      selector: 'node[[degree >= 2400]][[degree <= 2405]]',
+      style: {
+        'height': '183.88659001643',
+        'width': '183.88659001643'
+      }
+    },{
+      selector: 'node[[degree >= 2405]][[degree <= 2410]]',
+      style: {
+        'height': '183.97950232246',
+        'width': '183.97950232246'
+      }
+    },{
+      selector: 'node[[degree >= 2410]][[degree <= 2415]]',
+      style: {
+        'height': '184.07228594098',
+        'width': '184.07228594098'
+      }
+    },{
+      selector: 'node[[degree >= 2415]][[degree <= 2420]]',
+      style: {
+        'height': '184.16494131667',
+        'width': '184.16494131667'
+      }
+    },{
+      selector: 'node[[degree >= 2420]][[degree <= 2425]]',
+      style: {
+        'height': '184.25746889173',
+        'width': '184.25746889173'
+      }
+    },{
+      selector: 'node[[degree >= 2425]][[degree <= 2430]]',
+      style: {
+        'height': '184.34986910596',
+        'width': '184.34986910596'
+      }
+    },{
+      selector: 'node[[degree >= 2430]][[degree <= 2435]]',
+      style: {
+        'height': '184.44214239671',
+        'width': '184.44214239671'
+      }
+    },{
+      selector: 'node[[degree >= 2435]][[degree <= 2440]]',
+      style: {
+        'height': '184.53428919897',
+        'width': '184.53428919897'
+      }
+    },{
+      selector: 'node[[degree >= 2440]][[degree <= 2445]]',
+      style: {
+        'height': '184.62630994531',
+        'width': '184.62630994531'
+      }
+    },{
+      selector: 'node[[degree >= 2445]][[degree <= 2450]]',
+      style: {
+        'height': '184.71820506595',
+        'width': '184.71820506595'
+      }
+    },{
+      selector: 'node[[degree >= 2450]][[degree <= 2455]]',
+      style: {
+        'height': '184.80997498879',
+        'width': '184.80997498879'
+      }
+    },{
+      selector: 'node[[degree >= 2455]][[degree <= 2460]]',
+      style: {
+        'height': '184.90162013938',
+        'width': '184.90162013938'
+      }
+    },{
+      selector: 'node[[degree >= 2460]][[degree <= 2465]]',
+      style: {
+        'height': '184.99314094095',
+        'width': '184.99314094095'
+      }
+    },{
+      selector: 'node[[degree >= 2465]][[degree <= 2470]]',
+      style: {
+        'height': '185.08453781446',
+        'width': '185.08453781446'
+      }
+    },{
+      selector: 'node[[degree >= 2470]][[degree <= 2475]]',
+      style: {
+        'height': '185.1758111786',
+        'width': '185.1758111786'
+      }
+    },{
+      selector: 'node[[degree >= 2475]][[degree <= 2480]]',
+      style: {
+        'height': '185.26696144976',
+        'width': '185.26696144976'
+      }
+    },{
+      selector: 'node[[degree >= 2480]][[degree <= 2485]]',
+      style: {
+        'height': '185.35798904214',
+        'width': '185.35798904214'
+      }
+    },{
+      selector: 'node[[degree >= 2485]][[degree <= 2490]]',
+      style: {
+        'height': '185.44889436768',
+        'width': '185.44889436768'
+      }
+    },{
+      selector: 'node[[degree >= 2490]][[degree <= 2495]]',
+      style: {
+        'height': '185.53967783612',
+        'width': '185.53967783612'
+      }
+    },{
+      selector: 'node[[degree >= 2495]][[degree <= 2500]]',
+      style: {
+        'height': '185.63033985502',
+        'width': '185.63033985502'
+      }
+    },{
+      selector: 'node[[degree >= 2500]]',
+      style: {
+        'height': '185.72088082975',
+        'width': '185.72088082975'
+      }
+    },
+  ],
+
+
+
+
+  layout: {
+    
+
+{% if method == "dynamic" %}
+  
+  name: 'cose',
+  // Called on `layoutready`
+  ready: function(){},
+
+  // Called on `layoutstop`
+  stop: function(){},
+
+  // Whether to animate while running the layout
+  animate: true,
+
+  // The layout animates only after this many milliseconds
+  // (prevents flashing on fast runs)
+  animationThreshold: 250,
+
+  // Number of iterations between consecutive screen positions update
+  // (0 -> only updated on the end)
+  refresh: 20,
+
+  // Whether to fit the network view after when done
+  fit: true,
+
+  // Padding on fit
+  padding: 30,
+
+  // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+  boundingBox: undefined,
+
+  // Randomize the initial positions of the nodes (true) or use existing positions (false)
+  randomize: true,
+
+  // Extra spacing between components in non-compound graphs
+  componentSpacing: 100,
+
+  // Node repulsion (non overlapping) multiplier
+  nodeRepulsion: function( node ){ return 400000; },
+
+  // Node repulsion (overlapping) multiplier
+  nodeOverlap: 10,
+
+  // Ideal edge (non nested) length
+  idealEdgeLength: function( edge ){ return 10; },
+
+  // Divisor to compute edge forces
+  edgeElasticity: function( edge ){ return 100; },
+
+  // Nesting factor (multiplier) to compute ideal edge length for nested edges
+  nestingFactor: 5,
+
+  // Gravity force (constant)
+  gravity: 80,
+
+  // Maximum number of iterations to perform
+  numIter: 1000,
+
+  // Initial temperature (maximum node displacement)
+  initialTemp: 200,
+
+  // Cooling factor (how the temperature is reduced between consecutive iterations
+  coolingFactor: 0.95,
+
+  // Lower temperature threshold (below this point the layout will end)
+  minTemp: 1.0,
+
+  // Whether to use threading to speed up the layout
+  useMultitasking: true
+  
+{% else %}
+    name: 'preset',
+{% endif %}
+
+
+
+
+  }
+
+
+  });
+
+
+  // var main = Utilities.makeSelector('{{q}}');
+  // cy.$(main).addClass('main-node');
+  // Utilities.BFSColorRegulated('{{q}}');
+</script>
+
+<script>
+
+  var availableTags = [{% for item in tags %}"{{item}}", {% endfor %} "Scheme"];
+  
+</script>
+
+<script src="/mycoregdb/public/cytoscape/js/config.js"></script>
+<script src="/mycoregdb/public/cytoscape/js/tracer.js"></script>
+
+<script src="/mycoregdb/public/cytoscape/js/controls.js"></script>
+<script src="/mycoregdb/public/cytoscape/js/tap-handler.js"></script>
+<script src="/mycoregdb/public/cytoscape/js/connector.js"></script>
+
+<script src="/mycoregdb/public/cytoscape/js/context-menu.js"></script>
+<script src="/mycoregdb/public/cytoscape/js/scorekeeper.js"></script>
+<script src="/mycoregdb/public/cytoscape/js/style.js"></script>
+
+<script>
+
+ $(".switch-box").on('click', function()
+  {
+      $(".switch-box").prop('checked',false);
+      Connector.setStatus(false);
+      Tracer.setStatus(false);
+      
+      var id = $(this).attr('id');
+
+      $(this).prop('checked',true);
+
+      if(id == 'connector-button') {
+        // connector is turned on and tracer is turned off
+        console.log('c');
+        Connector.setStatus(true);
+        Tracer.destroy();
+      } else if(id == 'tracer-button'){
+        // tracer is turned on and connector is turned off
+        console.log('t');
+        Tracer.setStatus(true);
+        Connector.destroy();
+      }
+  });
+</script>
+
+<script defer>
+
+
+  function hideLoader() {
+    $('#loader').css('display', 'none');
+  }
+
+  function showLoader() {
+    $('#loader').css('display', 'block');
+  }
+
+  showLoader();
+
+  cy.on('layoutstop', function() {
+    setTimeout(function() {
+      hideLoader();
+    }, 1000);
+  });
+
+  setTimeout(function() {
+    hideLoader();
+  }, 20000);
+
+
+  // jQuery(window).load(function () {
+  //   // alert('page is loaded');
+  //   hideLoader();
+  //   setTimeout(function () {
+  //       alert('page is loaded and 1 minute has passed');   
+  //   }, 60000);
+  // });
+</script>
+
+</body>
+</html>
