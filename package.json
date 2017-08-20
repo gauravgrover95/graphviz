@@ -1,0 +1,14 @@
+{
+  "name": "cytoscape",
+  "version": "0.0.3",
+  "description": "Web View of Regulatory Network",
+  "main": "index.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
